@@ -1,36 +1,109 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FBC × Ledger Invite Contest
 
-## Getting Started
+Production site for the FUTO Blockchain Club (FBC) × Ledger invite contest. Students join the Ledger community, join FBC, follow FBC socials, and climb a live referral leaderboard.
 
-First, run the development server:
+## Stack
+
+- **Next.js 14** (App Router) + TypeScript + Tailwind CSS
+- **Supabase** (Postgres + RLS)
+- **Vercel** deployment target
+
+## Pages
+
+| Route | Description |
+|-------|-------------|
+| `/` | Landing — hero, how-it-works, countdown (ends **August 1**) |
+| `/signup` | Form + social click-gated verification |
+| `/thank-you` | Personal referral link + share intents |
+| `/leaderboard` | Live anonymized rankings (poll every 15s) |
+| `/admin` | Password-gated signup table + CSV export |
+
+## Setup
+
+### 1. Install
+
+```bash
+npm install
+```
+
+### 2. Environment
+
+Copy `.env.example` → `.env.local` and fill in:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+ADMIN_PASSWORD=
+NEXT_PUBLIC_LEDGER_TG_LINK=
+NEXT_PUBLIC_FBC_TG_LINK=
+NEXT_PUBLIC_FBC_X_LINK=
+```
+
+- Supabase keys: project **Settings → API**
+- `ADMIN_PASSWORD`: shared password for `/admin` (checked server-side; session cookie)
+- Social links: real Telegram / X URLs for the verification buttons
+
+### 3. Database
+
+Schema lives in `supabase/migrations/`. Apply via Supabase CLI (linked project) or run the SQL in the dashboard SQL editor.
+
+Core table:
+
+```sql
+create table signups (
+  id uuid primary key default gen_random_uuid(),
+  full_name text not null,
+  department text not null,
+  level text not null,
+  niche text not null,
+  skill_level text not null,
+  x_handle text not null,
+  telegram_username text not null,
+  ref_code text unique not null,
+  referred_by text references signups(ref_code),
+  joined_ledger boolean default false,
+  joined_fbc boolean default false,
+  followed_x boolean default false,
+  created_at timestamptz default now()
+);
+```
+
+RLS is enabled. Public anon can insert; raw PII is **not** selectable via the anon key. Leaderboard and admin reads go through Next.js API routes using the **service role** key (server-only).
+
+### 4. Local dev
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 5. Deploy (Vercel)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+vercel
+```
 
-## Learn More
+Set the same env vars in the Vercel project settings (or via `vercel env`).
 
-To learn more about Next.js, take a look at the following resources:
+## Referral flow
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Visitor hits `/?ref=CODE` (or any page with `?ref=`)
+2. Code is stored in `localStorage` (`fbc_ref`) + a cookie
+3. Signup form prefills “Referred by” when present
+4. On submit, a new 7-char `ref_code` is generated and the user is sent to `/thank-you?ref=…`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Assumptions
 
-## Deploy on Vercel
+- **Levels:** 100, 200, 300, 400, 500, Postgrad (FUTO-style)
+- **Niches:** Development, Design, Content & Marketing, Community & Growth, Research, Trading/DeFi, Other
+- **Skill levels:** Beginner, Intermediate, Advanced
+- **Admin auth:** shared password + httpOnly session cookie (not full user auth)
+- **Contest end:** August 1, 2026 (WAT)
+- **Social verification:** click-gated self-attestation (no live X follow API)
+- Social link env vars may still be placeholders — update them before launch
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project ownership
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Built and maintained by **Iyke** ([@devIykee](https://github.com/devIykee)).

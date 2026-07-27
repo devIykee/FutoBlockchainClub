@@ -3,21 +3,96 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a0e1a;
+  --foreground: #e2e1ef;
+  --electric: #0038ec;
+  --electric-light: #bac3ff;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Kinetic Ledger — angular / cyber-brutalist shapes */
+.clip-diagonal {
+  clip-path: polygon(0 0, 100% 0, 100% 92%, 96% 100%, 0 100%);
+}
+
+.clip-button {
+  clip-path: polygon(
+    8px 0,
+    100% 0,
+    100% calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    0 100%,
+    0 8px
+  );
+}
+
+.clip-card {
+  clip-path: polygon(
+    0 0,
+    calc(100% - 16px) 0,
+    100% 16px,
+    100% 100%,
+    16px 100%,
+    0 calc(100% - 16px)
+  );
+}
+
+.diagonal-divider {
+  clip-path: polygon(0 12%, 100% 0, 100% 88%, 0 100%);
+}
+
+.step-number {
+  -webkit-text-stroke: 1px #bac3ff;
+  color: transparent;
+}
+
+.hard-shadow {
+  box-shadow: 4px 4px 0px 0px #0038ec;
+}
+
+.glitch-hover:hover {
+  animation: glitch 0.2s infinite;
+}
+
+@keyframes glitch {
+  0% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    transform: translate(2px, 2px);
+  }
+  80% {
+    transform: translate(2px, -2px);
+  }
+  100% {
+    transform: translate(0);
+  }
+}
+
+/* Dot grid background motif */
+.bg-grid {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(186, 195, 255, 0.08) 1px,
+    transparent 0
+  );
+  background-size: 24px 24px;
 }
 
 @layer utilities {
