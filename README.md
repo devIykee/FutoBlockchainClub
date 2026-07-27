@@ -1,6 +1,8 @@
-# FBC — FUTO Blockchain Club
+# FutoBlockchainClub
 
-Official public website for **FUTO Blockchain Club (FBC)**. The Ledger Invite Contest is a time-boxed campaign under `/ledger-contest`, not the site’s primary brand.
+Official public website for **FutoBlockchainClub** (FUTO Blockchain Club / FBC). The Ledger Invite Contest is a time-boxed campaign under `/ledger-contest`, not the site’s primary brand.
+
+**Repository:** [github.com/devIykee/FutoBlockchainClub](https://github.com/devIykee/FutoBlockchainClub)
 
 ## Stack
 

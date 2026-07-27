@@ -19,15 +19,15 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "FBC — FUTO Blockchain Club",
-    template: "%s · FBC",
+    default: "FutoBlockchainClub",
+    template: "%s · FutoBlockchainClub",
   },
   description:
-    "Official website of FUTO Blockchain Club (FBC) — community, education, bounties, and on-chain builders at FUTO.",
+    "Official website of FutoBlockchainClub (FBC) — community, education, bounties, and on-chain builders at FUTO.",
   openGraph: {
-    title: "FBC — FUTO Blockchain Club",
+    title: "FutoBlockchainClub",
     description:
-      "University blockchain club at FUTO. Events, education, community, and campaigns.",
+      "FUTO Blockchain Club — events, education, community, and campaigns.",
     type: "website",
   },
 };
