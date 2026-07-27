@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: "class",
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -10,55 +11,52 @@ const config: Config = {
     extend: {
       colors: {
         bg: {
-          DEFAULT: "#0A0C10",
-          deep: "#0c0e12",
-          surface: "#111318",
-          card: "#1a1c20",
-          elevated: "#1e2024",
-          high: "#282a2e",
-          highest: "#333539",
+          DEFAULT: "var(--bg)",
+          deep: "var(--bg-deep)",
+          surface: "var(--bg-surface)",
+          card: "var(--bg-card)",
+          elevated: "var(--bg-elevated)",
+          high: "var(--bg-high)",
+          highest: "var(--bg-highest)",
         },
         cyan: {
-          DEFAULT: "#00E5FF",
-          soft: "#c3f5ff",
-          dim: "#00daf3",
-          deep: "#00363d",
+          DEFAULT: "var(--cyan)",
+          soft: "var(--cyan-soft)",
+          dim: "var(--cyan-dim)",
+          deep: "var(--cyan-deep)",
         },
-        /** Brand blue from FBC logo mark */
         brand: {
-          DEFAULT: "#0038EC",
-          deep: "#0028a8",
+          DEFAULT: "var(--brand)",
+          deep: "var(--brand-deep)",
         },
         ink: {
-          DEFAULT: "#e2e2e8",
-          muted: "#bac9cc",
-          dim: "#849396",
+          DEFAULT: "var(--ink)",
+          muted: "var(--ink-muted)",
+          dim: "var(--ink-dim)",
         },
         outline: {
-          DEFAULT: "#849396",
-          variant: "#3b494c",
+          DEFAULT: "var(--outline)",
+          variant: "var(--outline-variant)",
         },
         indigo: {
-          soft: "#bdc2ff",
-          deep: "#343d96",
-          muted: "#2a2f4a",
+          soft: "var(--indigo-soft)",
+          deep: "var(--indigo-deep)",
+          muted: "var(--indigo-muted)",
         },
-        /** Semantic tokens — palette-bound only */
         danger: {
-          DEFAULT: "#ffb4ab",
-          soft: "rgba(255, 180, 171, 0.12)",
-          border: "rgba(255, 180, 171, 0.35)",
+          DEFAULT: "var(--danger)",
+          soft: "var(--danger-soft)",
+          border: "var(--danger-border)",
         },
         success: {
-          DEFAULT: "#00E5FF",
-          soft: "rgba(0, 229, 255, 0.12)",
+          DEFAULT: "var(--success)",
+          soft: "var(--success-soft)",
         },
-        /** Warm secondary for Hall of Fame achievement framing */
         gold: {
-          DEFAULT: "#e8c47c",
-          soft: "rgba(232, 196, 124, 0.12)",
-          border: "rgba(232, 196, 124, 0.35)",
-          deep: "#3d3420",
+          DEFAULT: "var(--gold)",
+          soft: "var(--gold-soft)",
+          border: "var(--gold-border)",
+          deep: "var(--gold-deep)",
         },
       },
       fontFamily: {
@@ -74,9 +72,9 @@ const config: Config = {
         container: "1200px",
       },
       boxShadow: {
-        glow: "0 0 15px rgba(0, 229, 255, 0.2)",
-        "glow-sm": "0 0 8px rgba(0, 229, 255, 0.15)",
-        "glow-gold": "0 0 15px rgba(232, 196, 124, 0.18)",
+        glow: "var(--shadow-glow)",
+        "glow-sm": "var(--shadow-glow)",
+        "glow-gold": "0 0 15px color-mix(in srgb, var(--gold) 20%, transparent)",
       },
       spacing: {
         "page-x": "16px",
@@ -86,7 +84,7 @@ const config: Config = {
       },
       keyframes: {
         "rank-up": {
-          "0%": { backgroundColor: "rgba(0, 229, 255, 0.22)" },
+          "0%": { backgroundColor: "color-mix(in srgb, var(--cyan) 22%, transparent)" },
           "100%": { backgroundColor: "transparent" },
         },
         "rank-slide": {

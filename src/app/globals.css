@@ -2,14 +2,94 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Light theme (default) */
 :root {
+  --background: #f2f4f7;
+  --foreground: #0a0c10;
+  --bg: #f2f4f7;
+  --bg-deep: #e8ecf1;
+  --bg-surface: #ffffff;
+  --bg-card: #ffffff;
+  --bg-elevated: #ffffff;
+  --bg-high: #f7f8fa;
+  --bg-highest: #eef1f5;
+  --cyan: #007a8a;
+  --cyan-soft: #e0f7fb;
+  --cyan-dim: #00a8bc;
+  --cyan-deep: #00363d;
+  --brand: #0038ec;
+  --brand-deep: #0028a8;
+  --ink: #0a0c10;
+  --ink-muted: #4a5560;
+  --ink-dim: #6b7680;
+  --outline: #849396;
+  --outline-variant: #c5ced4;
+  --border: rgba(10, 12, 16, 0.1);
+  --border-strong: rgba(10, 12, 16, 0.16);
+  --indigo-soft: #5b63b5;
+  --indigo-deep: #343d96;
+  --indigo-muted: #e8eaf6;
+  --danger: #b42318;
+  --danger-soft: rgba(180, 35, 24, 0.08);
+  --danger-border: rgba(180, 35, 24, 0.28);
+  --success: #007a8a;
+  --success-soft: rgba(0, 122, 138, 0.1);
+  --gold: #9a6b1a;
+  --gold-soft: rgba(154, 107, 26, 0.1);
+  --gold-border: rgba(154, 107, 26, 0.3);
+  --gold-deep: #3d3420;
+  --glass-bg: rgba(255, 255, 255, 0.82);
+  --glass-border: rgba(10, 12, 16, 0.1);
+  --nav-bg: rgba(242, 244, 247, 0.88);
+  --ambient: rgba(0, 56, 236, 0.06);
+  --focus-ring: 0 0 0 2px #f2f4f7, 0 0 0 4px #007a8a;
+  --shadow-glow: 0 0 15px rgba(0, 122, 138, 0.15);
+  color-scheme: light;
+}
+
+/* Dark theme */
+.dark {
   --background: #0a0c10;
   --foreground: #e2e2e8;
-  --accent: #00e5ff;
+  --bg: #0a0c10;
+  --bg-deep: #0c0e12;
+  --bg-surface: #111318;
+  --bg-card: #1a1c20;
+  --bg-elevated: #1e2024;
+  --bg-high: #282a2e;
+  --bg-highest: #333539;
+  --cyan: #00e5ff;
+  --cyan-soft: #c3f5ff;
+  --cyan-dim: #00daf3;
+  --cyan-deep: #00363d;
   --brand: #0038ec;
-  --gold: #e8c47c;
+  --brand-deep: #0028a8;
+  --ink: #e2e2e8;
+  --ink-muted: #bac9cc;
+  --ink-dim: #849396;
+  --outline: #849396;
+  --outline-variant: #3b494c;
+  --border: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.15);
+  --indigo-soft: #bdc2ff;
+  --indigo-deep: #343d96;
+  --indigo-muted: #2a2f4a;
   --danger: #ffb4ab;
+  --danger-soft: rgba(255, 180, 171, 0.12);
+  --danger-border: rgba(255, 180, 171, 0.35);
+  --success: #00e5ff;
+  --success-soft: rgba(0, 229, 255, 0.12);
+  --gold: #e8c47c;
+  --gold-soft: rgba(232, 196, 124, 0.12);
+  --gold-border: rgba(232, 196, 124, 0.35);
+  --gold-deep: #3d3420;
+  --glass-bg: rgba(26, 28, 32, 0.88);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --nav-bg: rgba(10, 12, 16, 0.88);
+  --ambient: rgba(0, 229, 255, 0.07);
   --focus-ring: 0 0 0 2px #0a0c10, 0 0 0 4px #00e5ff;
+  --shadow-glow: 0 0 15px rgba(0, 229, 255, 0.2);
+  color-scheme: dark;
 }
 
 html {
@@ -37,33 +117,32 @@ body {
   font-size: 16px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Subtle top wash only — not a full decorative gradient blanket */
 .bg-ambient {
   background-image: radial-gradient(
     ellipse 70% 40% at 50% -10%,
-    rgba(0, 229, 255, 0.07),
+    var(--ambient),
     transparent 70%
   );
 }
 
 .glass {
-  background: rgba(30, 32, 36, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
 
 .glass-strong {
-  background: rgba(26, 28, 32, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
 
 @layer base {
-  /* System-aligned focus for all interactive elements */
   a:focus-visible,
   button:focus-visible,
   input:focus-visible,
@@ -84,13 +163,18 @@ body {
   }
 
   .btn-primary:hover {
-    box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+    box-shadow: var(--shadow-glow);
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-btn border border-white/15 bg-transparent
+    @apply inline-flex items-center justify-center gap-2 rounded-btn bg-transparent
       px-6 py-3 min-h-[44px] font-sans text-sm font-semibold text-ink transition-colors
-      hover:border-cyan/40 hover:text-ink active:scale-[0.98];
+      hover:text-ink active:scale-[0.98];
+    border: 1px solid var(--border-strong);
+  }
+
+  .btn-secondary:hover {
+    border-color: color-mix(in srgb, var(--cyan) 40%, transparent);
   }
 
   .label-caps {
@@ -98,18 +182,22 @@ body {
   }
 
   .field-input {
-    @apply w-full rounded-btn border border-white/10 bg-bg-deep px-4 py-3 min-h-[44px]
+    @apply w-full rounded-btn px-4 py-3 min-h-[44px]
       font-sans text-base text-ink outline-none transition-shadow
-      placeholder:text-ink-dim/70;
+      placeholder:text-ink-dim;
+    background: var(--bg-deep);
+    border: 1px solid var(--border);
   }
 
   .field-input:focus {
-    border-color: rgba(0, 229, 255, 0.55);
-    box-shadow: 0 0 0 1px rgba(0, 229, 255, 0.35);
+    border-color: color-mix(in srgb, var(--cyan) 55%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--cyan) 35%, transparent);
   }
 
   .card-surface {
-    @apply rounded-card border border-white/10 bg-bg-elevated p-6;
+    @apply rounded-card p-6;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
   }
 
   .section-y {
@@ -121,12 +209,17 @@ body {
   }
 
   .alert-danger {
-    @apply rounded-btn border border-danger-border bg-danger-soft px-4 py-3 text-sm text-danger;
+    @apply rounded-btn px-4 py-3 text-sm text-danger;
+    background: var(--danger-soft);
+    border: 1px solid var(--danger-border);
   }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+  .border-theme {
+    border-color: var(--border);
   }
 }

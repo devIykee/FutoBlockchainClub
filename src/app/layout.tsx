@@ -3,6 +3,8 @@ import { Hanken_Grotesk, Inter } from "next/font/google";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { RefCapture } from "@/components/RefCapture";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { ThemeScript } from "@/components/theme-script";
 import "./globals.css";
 
 const hanken = Hanken_Grotesk({
@@ -18,14 +20,17 @@ const inter = Inter({
 });
 
 export const viewport: Viewport = {
-  themeColor: "#0038EC",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f2f4f7" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0c10" },
+  ],
   width: "device-width",
   initialScale: 1,
 };
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "https://futoblockchainclub.vercel.app"
+    process.env.NEXT_PUBLIC_SITE_URL || "https://fbc-ledger-contest.vercel.app"
   ),
   title: {
     default: "FutoBlockchainClub",
@@ -73,14 +78,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
       <body
         className={`${hanken.variable} ${inter.variable} flex min-h-screen flex-col bg-bg font-sans text-ink antialiased`}
       >
-        <RefCapture />
-        <Nav />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <ThemeProvider>
+          <RefCapture />
+          <Nav />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );

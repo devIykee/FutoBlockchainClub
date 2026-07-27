@@ -5,9 +5,13 @@ import { useRouter } from "next/navigation";
 import { ExternalLink, Lock, LockOpen, Send } from "lucide-react";
 import { LEVELS, NICHES, SKILL_LEVELS } from "@/lib/constants";
 import { SOCIAL_LINKS } from "@/lib/socials";
+import {
+  clearSocialVerify,
+  readSocialVerify,
+  writeSocialVerify,
+  type SocialKey,
+} from "@/lib/social-verify-storage";
 import { readStoredRef } from "./RefCapture";
-
-type SocialKey = "ledger" | "fbc" | "x";
 
 const socials: {
   key: SocialKey;
@@ -52,13 +56,28 @@ export function SignupForm() {
     fbc: false,
     x: false,
   });
+  const [hydrated, setHydrated] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     setReferredBy(readStoredRef());
+    const saved = readSocialVerify();
+    setClicked(saved.clicked);
+    // Only restore checks for links that were already opened
+    setChecked({
+      ledger: saved.clicked.ledger && saved.checked.ledger,
+      fbc: saved.clicked.fbc && saved.checked.fbc,
+      x: saved.clicked.x && saved.checked.x,
+    });
+    setHydrated(true);
   }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    writeSocialVerify({ clicked, checked });
+  }, [clicked, checked, hydrated]);
 
   const allVerified = useMemo(
     () => checked.ledger && checked.fbc && checked.x,
@@ -68,6 +87,11 @@ export function SignupForm() {
   function openSocial(key: SocialKey, href: string) {
     window.open(href, "_blank", "noopener,noreferrer");
     setClicked((c) => ({ ...c, [key]: true }));
+  }
+
+  function onCheck(key: SocialKey, value: boolean) {
+    if (!clicked[key]) return;
+    setChecked((c) => ({ ...c, [key]: value }));
   }
 
   function validate(payload: {
@@ -134,6 +158,7 @@ export function SignupForm() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Signup failed");
+      clearSocialVerify();
       router.push(
         `/ledger-contest/thank-you?ref=${encodeURIComponent(data.ref_code)}`
       );
@@ -173,9 +198,7 @@ export function SignupForm() {
                     className="h-5 w-5 accent-cyan disabled:opacity-40"
                     disabled={!clicked[s.key]}
                     checked={checked[s.key]}
-                    onChange={(e) =>
-                      setChecked((c) => ({ ...c, [s.key]: e.target.checked }))
-                    }
+                    onChange={(e) => onCheck(s.key, e.target.checked)}
                   />
                   {s.checkbox}
                 </label>

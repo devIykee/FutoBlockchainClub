@@ -6,12 +6,14 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-auto w-full border-t border-white/10 bg-bg-deep">
+    <footer
+      className="mt-auto w-full border-t bg-bg-deep"
+      style={{ borderColor: "var(--border)" }}
+    >
       <div className="mx-auto flex w-full max-w-container flex-col gap-10 page-pad py-12 md:flex-row md:items-start md:justify-between">
         <div className="max-w-sm space-y-4">
-          <div className="flex items-center gap-3 opacity-90">
-            <Logo size={32} />
-            <span className="font-display text-lg font-semibold text-ink">FBC</span>
+          <div>
+            <Logo size={36} />
           </div>
           <p className="text-base leading-relaxed text-ink">
             FUTO Blockchain Club — building community, skills, and on-chain culture at the
@@ -103,7 +105,7 @@ export function Footer() {
           </div>
         </div>
       </div>
-      <div className="border-t border-white/5 page-pad py-4">
+      <div className="border-t page-pad py-4" style={{ borderColor: "var(--border)" }}>
         <p className="mx-auto max-w-container text-center text-xs text-ink-dim md:text-left">
           © {year} FutoBlockchainClub. All rights reserved.
         </p>

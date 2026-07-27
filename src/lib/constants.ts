@@ -4,6 +4,8 @@ export const CONTEST_END = new Date("2026-08-01T23:59:59+01:00");
 export const REF_STORAGE_KEY = "fbc_ref";
 export const REF_COOKIE_NAME = "fbc_ref";
 export const ADMIN_COOKIE_NAME = "fbc_admin_session";
+/** Persists signup social click + checkbox state across refresh */
+export const SOCIAL_VERIFY_STORAGE_KEY = "fbc_social_verify";
 
 /** Leaderboard poll interval — free-tier friendly. */
 export const LEADERBOARD_POLL_MS = 45_000;
