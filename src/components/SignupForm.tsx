@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ExternalLink, Lock, LockOpen, Send } from "lucide-react";
 import { LEVELS, NICHES, SKILL_LEVELS } from "@/lib/constants";
 import { SOCIAL_LINKS } from "@/lib/socials";
 import { readStoredRef } from "./RefCapture";
@@ -157,13 +158,11 @@ export function SignupForm() {
         </div>
 
         <div className="space-y-3">
-          {socials.map((s, i) => (
-            <div key={s.key} className="card-surface p-4 sm:p-5">
+          {socials.map((s) => (
+            <div key={s.key} className="card-surface !p-4 sm:!p-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <p className="label-caps">
-                    Required · 0{i + 1}
-                  </p>
+                  <p className="label-caps">Required</p>
                   <h3 className="mt-1 font-display text-lg font-semibold text-ink">
                     {s.label}
                   </h3>
@@ -187,6 +186,7 @@ export function SignupForm() {
                 className="btn-secondary mt-4 w-full"
               >
                 {s.action}
+                <ExternalLink className="h-4 w-4" />
               </button>
             </div>
           ))}
@@ -194,20 +194,31 @@ export function SignupForm() {
       </section>
 
       <section
-        className={`card-surface p-6 md:p-8 transition-opacity ${
+        className={`card-surface transition-opacity ${
           allVerified ? "opacity-100" : "opacity-50 pointer-events-none"
         }`}
       >
         <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-display text-xl font-bold text-ink">Registration</h2>
-          <span className="label-caps">
-            {allVerified ? "Unlocked" : "Locked"}
+          <span className="inline-flex items-center gap-1.5 label-caps">
+            {allVerified ? (
+              <>
+                <LockOpen className="h-3.5 w-3.5 text-cyan" />
+                Unlocked
+              </>
+            ) : (
+              <>
+                <Lock className="h-3.5 w-3.5" />
+                Locked
+              </>
+            )}
           </span>
         </div>
 
         {referredBy && (
-          <div className="mb-6 rounded-btn border border-cyan/30 bg-cyan/10 px-4 py-3 text-sm text-cyan">
-            Referred by: <span className="font-semibold">@{referredBy}</span>
+          <div className="mb-6 rounded-btn border border-cyan/25 bg-cyan/10 px-4 py-3 text-sm text-ink">
+            Referred by:{" "}
+            <span className="font-semibold text-cyan">@{referredBy}</span>
           </div>
         )}
 
@@ -262,17 +273,14 @@ export function SignupForm() {
             autoCorrect="off"
           />
 
-          {error && (
-            <p className="rounded-btn border border-red-400/40 bg-red-400/10 px-3 py-2 text-sm text-red-200">
-              {error}
-            </p>
-          )}
+          {error && <p className="alert-danger">{error}</p>}
 
           <button
             type="submit"
             disabled={!allVerified || submitting}
             className="btn-primary w-full text-base"
           >
+            <Send className="h-4 w-4" />
             {submitting ? "Submitting…" : "Submit registration"}
           </button>
         </form>
@@ -311,9 +319,9 @@ function Field({
         autoComplete={autoComplete}
         autoCapitalize={autoCapitalize}
         autoCorrect={autoCorrect}
-        className={`field-input ${error ? "border-red-400/50" : ""}`}
+        className={`field-input ${error ? "border-danger/50" : ""}`}
       />
-      {error && <span className="text-xs text-red-300">{error}</span>}
+      {error && <span className="text-xs text-danger">{error}</span>}
     </label>
   );
 }
@@ -335,7 +343,7 @@ function Select({
       <select
         name={name}
         defaultValue=""
-        className={`field-input ${error ? "border-red-400/50" : ""}`}
+        className={`field-input ${error ? "border-danger/50" : ""}`}
       >
         <option value="" disabled>
           Select…
@@ -346,7 +354,7 @@ function Select({
           </option>
         ))}
       </select>
-      {error && <span className="text-xs text-red-300">{error}</span>}
+      {error && <span className="text-xs text-danger">{error}</span>}
     </label>
   );
 }

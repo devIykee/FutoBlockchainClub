@@ -41,7 +41,7 @@ export function Countdown({ compact = false }: { compact?: boolean }) {
 
   if (ended) {
     return (
-      <div className="font-sans text-sm font-medium uppercase tracking-wider text-red-300">
+      <div className="font-sans text-sm font-medium uppercase tracking-wider text-danger">
         Contest closed
       </div>
     );
@@ -58,7 +58,7 @@ export function Countdown({ compact = false }: { compact?: boolean }) {
     return (
       <div className="flex flex-col gap-1">
         <span className="label-caps">Ends in</span>
-        <div className="flex gap-3 font-display text-2xl font-bold text-cyan">
+        <div className="flex gap-3 font-display text-2xl font-bold text-ink tabular-nums">
           {units.map((u) => (
             <div key={u.label}>
               {pad(u.value)}
@@ -75,7 +75,7 @@ export function Countdown({ compact = false }: { compact?: boolean }) {
   return (
     <div className="inline-flex flex-col gap-2 rounded-card border border-white/10 bg-bg-card px-5 py-4">
       <span className="label-caps">Contest ends August 1</span>
-      <div className="flex gap-4 font-display text-3xl font-bold text-cyan md:text-4xl">
+      <div className="flex gap-4 font-display text-3xl font-bold text-ink tabular-nums md:text-4xl">
         {units.map((u) => (
           <div key={u.label} className="flex min-w-[3rem] flex-col items-center">
             <span>{pad(u.value)}</span>

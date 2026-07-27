@@ -1,7 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
+import {
+  ArrowRight,
+  Check,
+  Copy,
+  Link2,
+  MessageCircle,
+  Send,
+} from "lucide-react";
 
 export function ThankYouClient({ refCode }: { refCode: string }) {
   const [copied, setCopied] = useState(false);
@@ -43,9 +51,12 @@ export function ThankYouClient({ refCode }: { refCode: string }) {
   }
 
   return (
-    <div className="mx-auto w-full max-w-lg px-page-x py-14 md:px-0">
-      <p className="label-caps text-cyan">Registration confirmed</p>
-      <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-cyan md:text-5xl">
+    <div className="mx-auto w-full max-w-lg page-pad py-12 md:py-16">
+      <div className="flex h-10 w-10 items-center justify-center rounded-btn bg-cyan/15 text-cyan">
+        <Check className="h-5 w-5" strokeWidth={2.5} />
+      </div>
+      <p className="mt-4 label-caps">Registration confirmed</p>
+      <h1 className="mt-2 font-display text-4xl font-bold tracking-tight text-ink md:text-5xl">
         You&apos;re in!
       </h1>
       <p className="mt-2 text-sm text-ink-muted">
@@ -53,19 +64,30 @@ export function ThankYouClient({ refCode }: { refCode: string }) {
         <span className="font-semibold text-ink">{refCode}</span>
       </p>
 
-      <div className="card-surface mt-10 p-6">
-        <p className="label-caps text-cyan">Amplify your reach</p>
+      <div className="card-surface mt-8">
+        <p className="label-caps">Amplify your reach</p>
         <p className="mt-2 text-base leading-relaxed text-ink">
-          Share your unique link. Every signup that uses it boosts your rank on the
-          live leaderboard.
+          Share your unique link. Every signup that uses it boosts your rank on the live
+          leaderboard.
         </p>
         <div className="mt-6">
           <p className="label-caps">Your referral link</p>
-          <div className="mt-2 rounded-btn border border-white/10 bg-bg-deep px-3 py-3">
-            <code className="block truncate text-sm text-cyan">{liveUrl}</code>
+          <div className="mt-2 flex items-center gap-2 rounded-btn border border-white/10 bg-bg-deep px-3 py-3">
+            <Link2 className="h-4 w-4 shrink-0 text-ink-muted" />
+            <code className="block truncate text-sm text-ink">{liveUrl}</code>
           </div>
           <button type="button" onClick={copy} className="btn-primary mt-3 w-full">
-            {copied ? "Copied!" : "Copy link"}
+            {copied ? (
+              <>
+                <Check className="h-4 w-4" />
+                Copied
+              </>
+            ) : (
+              <>
+                <Copy className="h-4 w-4" />
+                Copy link
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -74,33 +96,47 @@ export function ThankYouClient({ refCode }: { refCode: string }) {
         <ShareLink
           href={`https://twitter.com/intent/tweet?text=${shareText}`}
           label="Share on X"
+          icon={<XIcon className="h-4 w-4" />}
         />
         <ShareLink
           href={`https://t.me/share/url?url=${encodeURIComponent(liveUrl)}&text=${encodeURIComponent(
             "Join the FBC Ledger Invite Contest with my link!"
           )}`}
           label="Share on Telegram"
+          icon={<Send className="h-4 w-4" />}
         />
-        <ShareLink href={`https://wa.me/?text=${shareText}`} label="Share on WhatsApp" />
+        <ShareLink
+          href={`https://wa.me/?text=${shareText}`}
+          label="Share on WhatsApp"
+          icon={<MessageCircle className="h-4 w-4" />}
+        />
       </div>
 
       <Link
         href="/ledger-contest/leaderboard"
-        className="mt-8 flex items-center justify-between rounded-card border border-cyan/30 bg-cyan/5 px-5 py-4 transition-colors hover:bg-cyan/10"
+        className="mt-8 flex items-center justify-between rounded-card border border-white/10 bg-bg-elevated px-5 py-4 transition-colors hover:border-cyan/30"
       >
         <div>
-          <p className="label-caps text-cyan">View rankings</p>
+          <p className="label-caps">View rankings</p>
           <p className="font-display text-sm font-semibold text-ink">
             Open live leaderboard
           </p>
         </div>
-        <span className="text-xl text-cyan">→</span>
+        <ArrowRight className="h-5 w-5 text-cyan" />
       </Link>
     </div>
   );
 }
 
-function ShareLink({ href, label }: { href: string; label: string }) {
+function ShareLink({
+  href,
+  label,
+  icon,
+}: {
+  href: string;
+  label: string;
+  icon: ReactNode;
+}) {
   return (
     <a
       href={href}
@@ -108,7 +144,16 @@ function ShareLink({ href, label }: { href: string; label: string }) {
       rel="noopener noreferrer"
       className="btn-secondary w-full"
     >
+      {icon}
       {label}
     </a>
+  );
+}
+
+function XIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z" />
+    </svg>
   );
 }

@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Menu, X } from "lucide-react";
+import { Logo } from "./Logo";
 
 const links = [
   { href: "/", label: "Home" },
@@ -20,13 +22,15 @@ export function Nav() {
   }, [pathname]);
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-white/10 bg-bg/80 backdrop-blur-md">
-      <div className="mx-auto flex w-full max-w-container items-center justify-between px-page-x py-3 md:px-page-x-md md:py-4">
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <span className="flex h-9 w-9 items-center justify-center rounded-btn bg-cyan/15 text-sm font-bold text-cyan ring-1 ring-cyan/30">
-            FBC
-          </span>
-          <span className="font-display text-lg font-bold tracking-tight text-ink group-hover:text-cyan transition-colors">
+    <nav className="sticky top-0 z-50 w-full border-b border-white/10 bg-bg/85 backdrop-blur-md">
+      <div className="mx-auto flex h-16 w-full max-w-container items-center justify-between page-pad md:h-[72px]">
+        <Link
+          href="/"
+          className="flex items-center gap-3 rounded-btn focus-visible:outline-none"
+          aria-label="FutoBlockchainClub home"
+        >
+          <Logo size={36} priority />
+          <span className="font-display text-base font-semibold tracking-tight text-ink sm:text-lg">
             FBC
           </span>
         </Link>
@@ -43,15 +47,15 @@ export function Nav() {
                 href={l.href}
                 className={`rounded-btn px-3 py-2 text-sm font-medium transition-colors ${
                   active
-                    ? "bg-cyan/10 text-cyan"
+                    ? "bg-white/5 text-ink"
                     : "text-ink-muted hover:text-ink hover:bg-white/5"
-                }`}
+                } ${active ? "shadow-[inset_0_-2px_0_0_#00E5FF]" : ""}`}
               >
                 {l.label}
               </Link>
             );
           })}
-          <Link href="/ledger-contest/signup" className="btn-primary ml-3">
+          <Link href="/ledger-contest/signup" className="btn-primary ml-4">
             Join contest
           </Link>
         </div>
@@ -61,17 +65,15 @@ export function Nav() {
           className="md:hidden flex h-11 w-11 items-center justify-center rounded-btn border border-white/10 text-ink"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
-          aria-label="Toggle menu"
+          aria-label={open ? "Close menu" : "Open menu"}
         >
-          <span className="font-sans text-xs font-semibold uppercase tracking-wider">
-            {open ? "Close" : "Menu"}
-          </span>
+          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </div>
 
       {open && (
         <div className="border-t border-white/10 md:hidden">
-          <div className="flex flex-col gap-1 px-page-x py-4">
+          <div className="flex flex-col gap-1 page-pad py-4">
             {links.map((l) => (
               <Link
                 key={l.href}

@@ -1,36 +1,40 @@
 import Link from "next/link";
 import { SOCIAL_LINKS } from "@/lib/socials";
+import { Logo } from "./Logo";
 
 export function Footer() {
   const year = new Date().getFullYear();
 
   return (
     <footer className="mt-auto w-full border-t border-white/10 bg-bg-deep">
-      <div className="mx-auto flex w-full max-w-container flex-col gap-8 px-page-x py-10 md:flex-row md:items-start md:justify-between md:px-page-x-md">
-        <div className="max-w-sm space-y-3">
-          <p className="font-display text-xl font-bold text-ink">FBC</p>
+      <div className="mx-auto flex w-full max-w-container flex-col gap-10 page-pad py-12 md:flex-row md:items-start md:justify-between">
+        <div className="max-w-sm space-y-4">
+          <div className="flex items-center gap-3 opacity-90">
+            <Logo size={32} />
+            <span className="font-display text-lg font-semibold text-ink">FBC</span>
+          </div>
           <p className="text-base leading-relaxed text-ink">
-            FUTO Blockchain Club — building community, skills, and on-chain culture
-            at the Federal University of Technology, Owerri.
+            FUTO Blockchain Club — building community, skills, and on-chain culture at the
+            Federal University of Technology, Owerri.
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 sm:gap-10">
           <div>
             <p className="label-caps mb-3">Explore</p>
-            <ul className="space-y-2 text-sm text-ink-muted">
+            <ul className="space-y-2.5 text-sm text-ink-muted">
               <li>
-                <Link href="/" className="hover:text-cyan transition-colors">
+                <Link href="/" className="hover:text-ink transition-colors">
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/hall-of-fame" className="hover:text-cyan transition-colors">
+                <Link href="/hall-of-fame" className="hover:text-ink transition-colors">
                   Hall of Fame
                 </Link>
               </li>
               <li>
-                <Link href="/team" className="hover:text-cyan transition-colors">
+                <Link href="/team" className="hover:text-ink transition-colors">
                   Team
                 </Link>
               </li>
@@ -38,19 +42,16 @@ export function Footer() {
           </div>
           <div>
             <p className="label-caps mb-3">Campaigns</p>
-            <ul className="space-y-2 text-sm text-ink-muted">
+            <ul className="space-y-2.5 text-sm text-ink-muted">
               <li>
-                <Link
-                  href="/ledger-contest"
-                  className="hover:text-cyan transition-colors"
-                >
+                <Link href="/ledger-contest" className="hover:text-ink transition-colors">
                   Ledger Contest
                 </Link>
               </li>
               <li>
                 <Link
                   href="/ledger-contest/leaderboard"
-                  className="hover:text-cyan transition-colors"
+                  className="hover:text-ink transition-colors"
                 >
                   Leaderboard
                 </Link>
@@ -58,7 +59,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/ledger-contest/signup"
-                  className="hover:text-cyan transition-colors"
+                  className="hover:text-ink transition-colors"
                 >
                   Sign up
                 </Link>
@@ -67,13 +68,13 @@ export function Footer() {
           </div>
           <div>
             <p className="label-caps mb-3">Socials</p>
-            <ul className="space-y-2 text-sm text-ink-muted">
+            <ul className="space-y-2.5 text-sm text-ink-muted">
               <li>
                 <a
                   href={SOCIAL_LINKS.fbcX}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-cyan transition-colors"
+                  className="hover:text-ink transition-colors"
                 >
                   X / Twitter
                 </a>
@@ -83,7 +84,7 @@ export function Footer() {
                   href={SOCIAL_LINKS.fbcTelegram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-cyan transition-colors"
+                  className="hover:text-ink transition-colors"
                 >
                   Telegram
                 </a>
@@ -93,7 +94,7 @@ export function Footer() {
                   href={SOCIAL_LINKS.fbcWhatsApp}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-cyan transition-colors"
+                  className="hover:text-ink transition-colors"
                 >
                   WhatsApp
                 </a>
@@ -102,9 +103,9 @@ export function Footer() {
           </div>
         </div>
       </div>
-      <div className="border-t border-white/5 px-page-x py-4 md:px-page-x-md">
+      <div className="border-t border-white/5 page-pad py-4">
         <p className="mx-auto max-w-container text-center text-xs text-ink-dim md:text-left">
-          © {year} FUTO Blockchain Club. All rights reserved.
+          © {year} FutoBlockchainClub. All rights reserved.
         </p>
       </div>
     </footer>

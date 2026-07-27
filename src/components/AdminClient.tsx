@@ -144,9 +144,7 @@ export function AdminClient() {
               autoComplete="current-password"
             />
           </label>
-          {loginError && (
-            <p className="mt-3 text-sm text-red-300">{loginError}</p>
-          )}
+          {loginError && <p className="mt-3 text-sm text-danger">{loginError}</p>}
           <button type="submit" className="btn-primary mt-6 w-full">
             Sign in
           </button>
@@ -156,10 +154,10 @@ export function AdminClient() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-container px-page-x py-10 md:px-page-x-md">
+    <div className="mx-auto w-full max-w-container page-pad py-10 md:py-12">
       <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <p className="label-caps text-cyan">Admin</p>
+          <p className="label-caps">Admin</p>
           <h1 className="mt-1 font-display text-3xl font-bold text-ink">
             Signups ({filtered.length})
           </h1>
@@ -217,9 +215,7 @@ export function AdminClient() {
         </select>
       </div>
 
-      {loadError && (
-        <p className="mb-4 text-sm text-red-300">{loadError}</p>
-      )}
+      {loadError && <p className="mb-4 alert-danger">{loadError}</p>}
 
       {/* Desktop table */}
       <div className="hidden overflow-x-auto rounded-card border border-white/10 md:block">

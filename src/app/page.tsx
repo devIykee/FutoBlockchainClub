@@ -1,13 +1,27 @@
 import Link from "next/link";
+import {
+  BookOpen,
+  Calendar,
+  Trophy,
+  Users,
+  ArrowRight,
+  Link2,
+} from "lucide-react";
 import { CLUB_HIGHLIGHTS } from "@/lib/constants";
+
+const highlightIcons = {
+  calendar: Calendar,
+  trophy: Trophy,
+  users: Users,
+  "book-open": BookOpen,
+} as const;
 
 export default function HomePage() {
   return (
     <div className="bg-ambient">
-      {/* Hero — club identity */}
-      <section className="mx-auto max-w-container px-page-x pb-16 pt-14 md:px-page-x-md md:pb-24 md:pt-20">
+      <section className="mx-auto max-w-container page-pad pb-16 pt-12 md:pb-20 md:pt-16">
         <div className="max-w-3xl">
-          <p className="label-caps text-cyan">FUTO Blockchain Club</p>
+          <p className="label-caps">FUTO Blockchain Club</p>
           <h1 className="mt-4 font-display text-4xl font-bold leading-[1.1] tracking-tight text-ink md:text-6xl">
             Build on-chain culture at FUTO
           </h1>
@@ -26,10 +40,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* What we do */}
-      <section className="border-t border-white/5 bg-bg-deep/50 py-16 md:py-20">
-        <div className="mx-auto max-w-container px-page-x md:px-page-x-md">
-          <div className="mb-10 max-w-xl">
+      <section className="border-t border-white/5 bg-bg-deep/50 section-y">
+        <div className="mx-auto max-w-container page-pad">
+          <div className="mb-8 max-w-xl md:mb-10">
             <h2 className="font-display text-3xl font-bold tracking-tight text-ink md:text-4xl">
               What we do
             </h2>
@@ -39,36 +52,45 @@ export default function HomePage() {
             </p>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {CLUB_HIGHLIGHTS.map((item) => (
-              <div key={item.title} className="card-surface p-6">
-                <h3 className="font-display text-lg font-semibold text-ink">
-                  {item.title}
-                </h3>
-                <p className="mt-3 text-base leading-relaxed text-ink">{item.body}</p>
-              </div>
-            ))}
+            {CLUB_HIGHLIGHTS.map((item) => {
+              const Icon = highlightIcons[item.icon];
+              return (
+                <div key={item.title} className="card-surface">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-btn bg-white/5 text-ink-muted">
+                    <Icon className="h-5 w-5" aria-hidden />
+                  </div>
+                  <h3 className="mt-4 font-display text-lg font-semibold text-ink">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-base leading-relaxed text-ink">{item.body}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* Contest teaser — present but not dominant */}
-      <section className="py-16 md:py-20">
-        <div className="mx-auto max-w-container px-page-x md:px-page-x-md">
-          <div className="card-surface relative overflow-hidden p-8 md:p-10">
-            <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-cyan/10 blur-2xl" />
-            <p className="label-caps text-cyan">Campaign</p>
-            <h2 className="mt-2 font-display text-2xl font-bold text-ink md:text-3xl">
-              Ledger Invite Contest
-            </h2>
-            <p className="mt-3 max-w-2xl text-base leading-relaxed text-ink">
-              A time-boxed referral contest with FBC × Ledger. Join the community, share
-              your link, and climb the leaderboard before August 1.
-            </p>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+      {/* Contest teaser — present, not dominant; cyan only on action */}
+      <section className="section-y">
+        <div className="mx-auto max-w-container page-pad">
+          <div className="card-surface flex flex-col gap-6 p-8 md:flex-row md:items-center md:justify-between md:p-10">
+            <div className="max-w-xl">
+              <p className="label-caps">Campaign</p>
+              <h2 className="mt-2 font-display text-2xl font-bold text-ink md:text-3xl">
+                Ledger Invite Contest
+              </h2>
+              <p className="mt-3 text-base leading-relaxed text-ink">
+                A time-boxed referral contest with FBC × Ledger. Join the community, share
+                your link, and climb the leaderboard before August 1.
+              </p>
+            </div>
+            <div className="flex shrink-0 flex-col gap-3 sm:flex-row">
               <Link href="/ledger-contest" className="btn-primary">
                 View contest
+                <ArrowRight className="h-4 w-4" />
               </Link>
               <Link href="/ledger-contest/leaderboard" className="btn-secondary">
+                <Link2 className="h-4 w-4" />
                 Leaderboard
               </Link>
             </div>
@@ -76,30 +98,31 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Quick links */}
-      <section className="border-t border-white/5 py-16 md:py-20">
-        <div className="mx-auto grid max-w-container grid-cols-1 gap-4 px-page-x sm:grid-cols-2 md:px-page-x-md">
+      <section className="border-t border-white/5 section-y">
+        <div className="mx-auto grid max-w-container grid-cols-1 gap-4 page-pad sm:grid-cols-2">
           <Link
             href="/hall-of-fame"
-            className="card-surface group p-8 transition-shadow hover:shadow-glow"
+            className="card-surface group transition-colors hover:border-gold/30"
           >
-            <p className="label-caps text-cyan">Wins</p>
-            <h3 className="mt-2 font-display text-2xl font-bold text-ink group-hover:text-cyan transition-colors">
+            <div className="flex h-10 w-10 items-center justify-center rounded-btn bg-gold-soft text-gold">
+              <Trophy className="h-5 w-5" />
+            </div>
+            <h3 className="mt-4 font-display text-2xl font-bold text-ink">
               Hall of Fame
             </h3>
-            <p className="mt-3 text-base leading-relaxed text-ink">
+            <p className="mt-2 text-base leading-relaxed text-ink">
               Members who have won bounties and hackathons at $100+ prize value.
             </p>
           </Link>
           <Link
             href="/team"
-            className="card-surface group p-8 transition-shadow hover:shadow-glow"
+            className="card-surface group transition-colors hover:border-white/20"
           >
-            <p className="label-caps text-cyan">People</p>
-            <h3 className="mt-2 font-display text-2xl font-bold text-ink group-hover:text-cyan transition-colors">
-              Core team
-            </h3>
-            <p className="mt-3 text-base leading-relaxed text-ink">
+            <div className="flex h-10 w-10 items-center justify-center rounded-btn bg-white/5 text-ink-muted">
+              <Users className="h-5 w-5" />
+            </div>
+            <h3 className="mt-4 font-display text-2xl font-bold text-ink">Core team</h3>
+            <p className="mt-2 text-base leading-relaxed text-ink">
               Leadership and core organizers keeping FBC running.
             </p>
           </Link>
