@@ -1,36 +1,33 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Archivo, JetBrains_Mono } from "next/font/google";
+import { Hanken_Grotesk, Inter } from "next/font/google";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { RefCapture } from "@/components/RefCapture";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
+const hanken = Hanken_Grotesk({
   subsets: ["latin"],
-  variable: "--font-space-grotesk",
+  variable: "--font-hanken",
   weight: ["400", "500", "600", "700"],
 });
 
-const archivo = Archivo({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-archivo",
+  variable: "--font-inter",
   weight: ["400", "500", "600", "700"],
-});
-
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-jetbrains",
-  weight: ["400", "500", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "FBC × Ledger Invite Contest",
+  title: {
+    default: "FBC — FUTO Blockchain Club",
+    template: "%s · FBC",
+  },
   description:
-    "FUTO Blockchain Club × Ledger invite contest. Join, refer classmates, climb the leaderboard.",
+    "Official website of FUTO Blockchain Club (FBC) — community, education, bounties, and on-chain builders at FUTO.",
   openGraph: {
-    title: "FBC × Ledger Invite Contest",
+    title: "FBC — FUTO Blockchain Club",
     description:
-      "Join FBC, join the Ledger community, share your ref link, and compete for prizes.",
+      "University blockchain club at FUTO. Events, education, community, and campaigns.",
     type: "website",
   },
 };
@@ -43,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${spaceGrotesk.variable} ${archivo.variable} ${jetbrains.variable} flex min-h-screen flex-col bg-navy font-body text-ink antialiased`}
+        className={`${hanken.variable} ${inter.variable} flex min-h-screen flex-col bg-bg font-sans text-ink antialiased`}
       >
         <RefCapture />
         <Nav />

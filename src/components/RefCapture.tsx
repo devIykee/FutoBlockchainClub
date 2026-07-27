@@ -5,7 +5,7 @@ import { REF_COOKIE_NAME, REF_STORAGE_KEY } from "@/lib/constants";
 
 /**
  * Captures ?ref=CODE from any page URL into localStorage + a short-lived cookie
- * so the code survives navigation to /signup.
+ * so the code survives navigation to /ledger-contest/signup.
  */
 export function RefCapture() {
   useEffect(() => {
@@ -15,7 +15,6 @@ export function RefCapture() {
       if (!code) return;
 
       localStorage.setItem(REF_STORAGE_KEY, code);
-      // 7-day cookie fallback
       const maxAge = 60 * 60 * 24 * 7;
       document.cookie = `${REF_COOKIE_NAME}=${encodeURIComponent(code)}; path=/; max-age=${maxAge}; SameSite=Lax`;
     } catch {

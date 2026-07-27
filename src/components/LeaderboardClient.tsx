@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import type { LeaderboardEntry, LeaderboardStats } from "@/lib/types";
+import { LEADERBOARD_POLL_MS } from "@/lib/constants";
 import { Countdown } from "./Countdown";
 
 export function LeaderboardClient() {
@@ -26,132 +27,153 @@ export function LeaderboardClient() {
 
   useEffect(() => {
     load();
-    const id = setInterval(load, 15000);
+    // Single poll loop per page — free-tier friendly (30–60s range)
+    const id = setInterval(load, LEADERBOARD_POLL_MS);
     return () => clearInterval(id);
   }, [load]);
 
   const top = stats?.entries.slice(0, 3) ?? [];
-  const rest = stats?.entries.slice(3) ?? [];
+  const rest = stats?.entries.filter((e) => e.rank > 3) ?? [];
+  const tableRows = top.length ? rest : stats?.entries ?? [];
 
   return (
-    <div className="mx-auto w-full max-w-container px-margin-mobile py-12 md:px-margin-desktop md:py-16">
+    <div className="mx-auto w-full max-w-container px-page-x py-10 md:px-page-x-md md:py-14">
       <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="font-mono text-xs uppercase tracking-widest text-electric-light">
-            {"// Live registry"}
-          </p>
-          <h1 className="mt-2 font-display text-4xl font-bold uppercase tracking-tight text-white md:text-5xl">
-            Leaderboard
+          <p className="label-caps text-cyan">Live leaderboard</p>
+          <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-ink md:text-5xl">
+            Referral rankings
           </h1>
-          <p className="mt-2 max-w-xl font-body text-ink-muted">
-            Ranked by verified referrals. Names are anonymized — first name + last initial only.
-            Top 5 positions are prize-eligible.
+          <p className="mt-3 max-w-xl text-base leading-relaxed text-ink">
+            Ranked by verified referrals. Names are anonymized — first name + last
+            initial only. Top 5 are prize-eligible.
           </p>
         </div>
         <Countdown compact />
       </div>
 
-      {/* Stats strip */}
-      <div className="mb-12 grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div className="mb-10 grid grid-cols-2 gap-3 md:grid-cols-4">
         <Stat label="Participants" value={stats?.total_participants ?? "—"} />
         <Stat label="Total referrals" value={stats?.total_referrals ?? "—"} />
         <Stat label="Prize slots" value="Top 5" highlight />
         <Stat label="Deadline" value="Aug 1" />
       </div>
 
-      {loading && (
-        <p className="font-mono text-sm text-ink-dim">Syncing leaderboard…</p>
-      )}
+      {loading && <p className="text-sm text-ink-muted">Loading leaderboard…</p>}
       {error && (
-        <p className="mb-6 border border-accent-coral/40 bg-accent-coral/10 px-4 py-3 font-mono text-xs text-accent-coral">
+        <p className="mb-6 rounded-btn border border-red-400/40 bg-red-400/10 px-4 py-3 text-sm text-red-200">
           {error}
         </p>
       )}
 
-      {/* Podium top 3 */}
       {top.length > 0 && (
-        <div className="mb-14 grid grid-cols-1 gap-4 md:grid-cols-3 md:items-end">
+        <div className="mb-12 grid grid-cols-1 gap-4 sm:grid-cols-3 sm:items-end">
           {[top[1], top[0], top[2]].filter(Boolean).map((entry) => (
             <PodiumCard key={entry.ref_code} entry={entry} />
           ))}
         </div>
       )}
 
-      {/* Full table */}
-      <div className="border border-outline-variant bg-navy-card">
-        <div className="flex items-center justify-between border-b border-outline-variant px-4 py-3 md:px-6">
-          <h2 className="font-display text-lg font-semibold uppercase tracking-wide text-white">
-            Registry cluster
-          </h2>
-          <span className="font-mono text-[10px] uppercase tracking-widest text-ink-dim">
-            Auto-refresh 15s
+      {/* Desktop table */}
+      <div className="hidden overflow-hidden rounded-card border border-white/10 md:block">
+        <div className="flex items-center justify-between border-b border-white/10 bg-bg-card px-6 py-3">
+          <h2 className="font-display text-lg font-semibold text-ink">Full rankings</h2>
+          <span className="label-caps">
+            Auto-refresh {LEADERBOARD_POLL_MS / 1000}s
           </span>
         </div>
-
         {stats && stats.entries.length === 0 && (
-          <p className="px-6 py-12 text-center font-body text-ink-muted">
+          <p className="px-6 py-12 text-center text-ink-muted">
             No referrals yet.{" "}
-            <Link href="/signup" className="text-electric-light underline">
+            <Link href="/ledger-contest/signup" className="text-cyan underline">
               Be the first to join
             </Link>
             .
           </p>
         )}
-
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[520px] text-left">
-            <thead>
-              <tr className="border-b border-outline-variant font-mono text-[10px] uppercase tracking-widest text-ink-dim">
-                <th className="px-4 py-3 md:px-6">Rank</th>
-                <th className="px-4 py-3">Identity</th>
-                <th className="px-4 py-3">Referrals</th>
-                <th className="px-4 py-3 md:px-6">Status</th>
+        <table className="w-full text-left">
+          <thead>
+            <tr className="border-b border-white/10 label-caps">
+              <th className="px-6 py-3">Rank</th>
+              <th className="px-4 py-3">Identity</th>
+              <th className="px-4 py-3">Referrals</th>
+              <th className="px-6 py-3">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(top.length ? [...top, ...rest] : tableRows).map((entry) => (
+              <tr
+                key={entry.ref_code}
+                className={`border-b border-white/5 transition-colors hover:bg-cyan/5 ${
+                  entry.rank <= 5 ? "bg-cyan/5" : ""
+                }`}
+              >
+                <td className="px-6 py-4 font-medium text-cyan">
+                  #{String(entry.rank).padStart(2, "0")}
+                </td>
+                <td className="px-4 py-4 font-display font-semibold text-ink">
+                  {entry.display_name}
+                  {entry.rank <= 5 && (
+                    <span className="ml-2 label-caps text-cyan">Prize zone</span>
+                  )}
+                </td>
+                <td className="px-4 py-4 font-medium text-ink">
+                  {entry.referral_count}
+                </td>
+                <td className="px-6 py-4">
+                  <span className="rounded-full border border-white/10 px-2.5 py-0.5 text-xs text-ink-muted">
+                    Active
+                  </span>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {(rest.length ? rest : stats?.entries ?? []).map((entry) => {
-                // if we showed podium, list starts at 4; else show all
-                const showAll = top.length === 0;
-                if (!showAll && entry.rank <= 3) return null;
-                return (
-                  <tr
-                    key={entry.ref_code}
-                    className={`border-b border-outline-variant/60 font-body transition-colors hover:bg-electric/5 ${
-                      entry.rank <= 5 ? "bg-electric/5" : ""
-                    }`}
-                  >
-                    <td className="px-4 py-4 font-mono text-sm text-electric-light md:px-6">
-                      #{String(entry.rank).padStart(2, "0")}
-                    </td>
-                    <td className="px-4 py-4 font-display font-semibold uppercase text-white">
-                      {entry.display_name}
-                      {entry.rank <= 5 && (
-                        <span className="ml-2 font-mono text-[9px] text-electric-light">
-                          PRIZE ZONE
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-4 font-mono text-sm text-ink">
-                      {entry.referral_count}
-                    </td>
-                    <td className="px-4 py-4 md:px-6">
-                      <span className="border border-outline-variant px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-ink-muted">
-                        Active
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile stacked cards */}
+      <div className="space-y-3 md:hidden">
+        <div className="flex items-center justify-between">
+          <h2 className="font-display text-lg font-semibold text-ink">Full rankings</h2>
+          <span className="label-caps">
+            {LEADERBOARD_POLL_MS / 1000}s refresh
+          </span>
         </div>
+        {(stats?.entries ?? []).map((entry) => (
+          <div
+            key={entry.ref_code}
+            className={`card-surface p-4 ${entry.rank <= 5 ? "shadow-glow border-cyan/20" : ""}`}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <span className="font-medium text-cyan">
+                #{String(entry.rank).padStart(2, "0")}
+              </span>
+              {entry.rank <= 5 && (
+                <span className="rounded-full bg-cyan/15 px-2 py-0.5 text-xs font-medium text-cyan">
+                  Prize zone
+                </span>
+              )}
+            </div>
+            <p className="mt-2 font-display text-lg font-semibold text-ink">
+              {entry.display_name}
+            </p>
+            <p className="mt-1 text-sm text-ink-muted">
+              {entry.referral_count} referral{entry.referral_count === 1 ? "" : "s"}
+            </p>
+          </div>
+        ))}
+        {stats && stats.entries.length === 0 && (
+          <p className="py-8 text-center text-ink-muted">
+            No referrals yet.{" "}
+            <Link href="/ledger-contest/signup" className="text-cyan underline">
+              Join now
+            </Link>
+          </p>
+        )}
       </div>
 
       <div className="mt-10 text-center">
-        <Link
-          href="/signup"
-          className="clip-button hard-shadow inline-block bg-electric px-10 py-4 font-display font-bold uppercase tracking-widest text-white hover:bg-white hover:text-electric transition-colors"
-        >
+        <Link href="/ledger-contest/signup" className="btn-primary">
           Join the contest
         </Link>
       </div>
@@ -170,22 +192,18 @@ function Stat({
 }) {
   return (
     <div
-      className={`border p-4 ${
+      className={`rounded-card p-4 ${
         highlight
-          ? "border-electric bg-electric text-white"
-          : "border-outline-variant bg-navy-card"
+          ? "bg-cyan text-cyan-deep"
+          : "border border-white/10 bg-bg-card"
       }`}
     >
-      <p
-        className={`font-mono text-[10px] uppercase tracking-widest ${
-          highlight ? "text-white/70" : "text-ink-dim"
-        }`}
-      >
+      <p className={`label-caps ${highlight ? "text-cyan-deep/70" : ""}`}>
         {label}
       </p>
       <p
         className={`mt-1 font-display text-2xl font-bold ${
-          highlight ? "text-white" : "text-electric-light"
+          highlight ? "text-cyan-deep" : "text-cyan"
         }`}
       >
         {value}
@@ -201,25 +219,23 @@ function PodiumCard({ entry }: { entry: LeaderboardEntry }) {
 
   return (
     <div
-      className={`border-2 p-6 text-center ${
+      className={`rounded-card border p-6 text-center ${
         isFirst
-          ? "border-electric bg-electric/15 md:order-none order-first md:-mb-4 md:scale-105"
-          : "border-outline-variant bg-navy-card"
-      } ${entry.rank === 2 ? "md:order-first" : ""} ${
-        entry.rank === 3 ? "md:order-last" : ""
+          ? "border-cyan/40 bg-cyan/10 shadow-glow sm:order-none order-first sm:-mb-2 sm:scale-105"
+          : "border-white/10 bg-bg-card"
+      } ${entry.rank === 2 ? "sm:order-first" : ""} ${
+        entry.rank === 3 ? "sm:order-last" : ""
       }`}
     >
-      <p className="font-mono text-xs uppercase tracking-widest text-electric-light">
-        #{entry.rank}
-      </p>
-      <h3 className="mt-2 font-display text-xl font-bold uppercase text-white">
+      <p className="label-caps text-cyan">#{entry.rank}</p>
+      <h3 className="mt-2 font-display text-xl font-bold text-ink">
         {entry.display_name}
       </h3>
-      <p className="mt-2 font-mono text-sm text-ink-muted">
-        {entry.referral_count} REF
+      <p className="mt-2 font-medium text-ink-muted">
+        {entry.referral_count} ref
       </p>
-      <p className="mt-4 border-t border-outline-variant pt-3 font-mono text-[10px] uppercase tracking-widest text-ink-dim">
-        {tier} tier · Prize zone
+      <p className="mt-4 border-t border-white/10 pt-3 label-caps">
+        {tier} · Prize zone
       </p>
     </div>
   );

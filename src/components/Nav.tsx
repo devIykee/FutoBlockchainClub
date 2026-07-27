@@ -2,85 +2,87 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const links = [
   { href: "/", label: "Home" },
-  { href: "/leaderboard", label: "Leaderboard" },
-  { href: "/signup", label: "Join" },
+  { href: "/hall-of-fame", label: "Hall of Fame" },
+  { href: "/team", label: "Team" },
+  { href: "/ledger-contest", label: "Contest" },
 ];
 
 export function Nav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
   return (
-    <nav className="sticky top-0 z-50 w-full border-b-2 border-electric bg-navy/95 backdrop-blur-sm">
-      <div className="mx-auto flex w-full max-w-container items-center justify-between px-margin-mobile py-4 md:px-margin-desktop">
-        <Link href="/" className="flex items-center gap-3 group">
-          <span className="flex h-9 w-9 items-center justify-center border-2 border-electric text-electric font-mono text-xs font-bold">
+    <nav className="sticky top-0 z-50 w-full border-b border-white/10 bg-bg/80 backdrop-blur-md">
+      <div className="mx-auto flex w-full max-w-container items-center justify-between px-page-x py-3 md:px-page-x-md md:py-4">
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <span className="flex h-9 w-9 items-center justify-center rounded-btn bg-cyan/15 text-sm font-bold text-cyan ring-1 ring-cyan/30">
             FBC
           </span>
-          <span className="font-display text-lg font-bold tracking-widest text-electric-light group-hover:text-white transition-colors uppercase">
-            FBC × Ledger
+          <span className="font-display text-lg font-bold tracking-tight text-ink group-hover:text-cyan transition-colors">
+            FBC
           </span>
         </Link>
 
-        <div className="hidden items-center gap-8 font-mono text-xs uppercase tracking-widest md:flex">
+        <div className="hidden items-center gap-1 md:flex">
           {links.map((l) => {
-            const active = pathname === l.href;
+            const active =
+              l.href === "/"
+                ? pathname === "/"
+                : pathname === l.href || pathname.startsWith(`${l.href}/`);
             return (
               <Link
                 key={l.href}
                 href={l.href}
-                className={
+                className={`rounded-btn px-3 py-2 text-sm font-medium transition-colors ${
                   active
-                    ? "text-electric-light border-b border-electric-light pb-0.5"
-                    : "text-ink-muted hover:text-electric-light transition-colors"
-                }
+                    ? "bg-cyan/10 text-cyan"
+                    : "text-ink-muted hover:text-ink hover:bg-white/5"
+                }`}
               >
                 {l.label}
               </Link>
             );
           })}
-          <Link
-            href="/signup"
-            className="clip-button bg-electric px-5 py-2.5 font-display font-bold text-white hover:bg-white hover:text-electric transition-colors"
-          >
-            Join Contest
+          <Link href="/ledger-contest/signup" className="btn-primary ml-3">
+            Join contest
           </Link>
         </div>
 
         <button
           type="button"
-          className="md:hidden text-electric-light font-mono text-xs uppercase tracking-widest border border-electric/50 px-3 py-2"
+          className="md:hidden flex h-11 w-11 items-center justify-center rounded-btn border border-white/10 text-ink"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-label="Toggle menu"
         >
-          {open ? "Close" : "Menu"}
+          <span className="font-sans text-xs font-semibold uppercase tracking-wider">
+            {open ? "Close" : "Menu"}
+          </span>
         </button>
       </div>
 
       {open && (
-        <div className="border-t border-outline-variant md:hidden">
-          <div className="flex flex-col gap-1 px-margin-mobile py-4 font-mono text-xs uppercase tracking-widest">
+        <div className="border-t border-white/10 md:hidden">
+          <div className="flex flex-col gap-1 px-page-x py-4">
             {links.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
-                onClick={() => setOpen(false)}
-                className="py-3 text-ink-muted hover:text-electric-light"
+                className="rounded-btn px-3 py-3 text-base font-medium text-ink-muted hover:bg-white/5 hover:text-ink min-h-[44px]"
               >
                 {l.label}
               </Link>
             ))}
-            <Link
-              href="/signup"
-              onClick={() => setOpen(false)}
-              className="mt-2 clip-button bg-electric px-5 py-3 text-center font-display font-bold text-white"
-            >
-              Join Contest
+            <Link href="/ledger-contest/signup" className="btn-primary mt-2 w-full">
+              Join contest
             </Link>
           </div>
         </div>

@@ -36,16 +36,12 @@ export function Countdown({ compact = false }: { compact?: boolean }) {
   }, []);
 
   if (!parts) {
-    return (
-      <div className="font-mono text-xs uppercase tracking-widest text-ink-dim">
-        Loading countdown…
-      </div>
-    );
+    return <div className="label-caps text-ink-dim">Loading countdown…</div>;
   }
 
   if (ended) {
     return (
-      <div className="font-mono text-sm uppercase tracking-widest text-accent-coral">
+      <div className="font-sans text-sm font-medium uppercase tracking-wider text-red-300">
         Contest closed
       </div>
     );
@@ -60,15 +56,15 @@ export function Countdown({ compact = false }: { compact?: boolean }) {
 
   if (compact) {
     return (
-      <div className="flex flex-col">
-        <span className="font-mono text-[10px] uppercase tracking-tighter text-ink-dim">
-          Ends in
-        </span>
-        <div className="flex gap-3 font-display text-2xl font-bold text-electric-light">
+      <div className="flex flex-col gap-1">
+        <span className="label-caps">Ends in</span>
+        <div className="flex gap-3 font-display text-2xl font-bold text-cyan">
           {units.map((u) => (
             <div key={u.label}>
               {pad(u.value)}
-              <span className="ml-0.5 font-mono text-xs text-ink-dim">{u.label}</span>
+              <span className="ml-0.5 text-xs font-sans font-medium text-ink-muted">
+                {u.label}
+              </span>
             </div>
           ))}
         </div>
@@ -77,15 +73,13 @@ export function Countdown({ compact = false }: { compact?: boolean }) {
   }
 
   return (
-    <div className="inline-flex flex-col gap-2 border border-outline-variant bg-navy-card px-5 py-4">
-      <span className="font-mono text-[10px] uppercase tracking-widest text-ink-dim">
-        {"// Contest ends August 1"}
-      </span>
-      <div className="flex gap-4 font-display text-3xl font-bold text-electric-light md:text-4xl">
+    <div className="inline-flex flex-col gap-2 rounded-card border border-white/10 bg-bg-card px-5 py-4">
+      <span className="label-caps">Contest ends August 1</span>
+      <div className="flex gap-4 font-display text-3xl font-bold text-cyan md:text-4xl">
         {units.map((u) => (
-          <div key={u.label} className="flex flex-col items-center min-w-[3rem]">
+          <div key={u.label} className="flex min-w-[3rem] flex-col items-center">
             <span>{pad(u.value)}</span>
-            <span className="font-mono text-[10px] text-ink-dim tracking-widest">{u.label}</span>
+            <span className="label-caps mt-1">{u.label}</span>
           </div>
         ))}
       </div>

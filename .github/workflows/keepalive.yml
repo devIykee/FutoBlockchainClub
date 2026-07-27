@@ -1,0 +1,26 @@
+# Prevents Supabase free-tier projects from pausing after 7 days of inactivity.
+# Hits a lightweight API route every 3 days (UTC).
+name: Supabase keep-alive
+
+on:
+  schedule:
+    # Every 3 days at 06:00 UTC
+    - cron: "0 6 */3 * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hit keepalive endpoint
+        env:
+          # Set in GitHub repo secrets, e.g. https://fbc-ledger-contest.vercel.app
+          SITE_URL: ${{ secrets.SITE_URL }}
+        run: |
+          if [ -z "$SITE_URL" ]; then
+            echo "SITE_URL secret is not set — skipping"
+            exit 0
+          fi
+          curl -fsS --retry 3 --retry-delay 5 "${SITE_URL%/}/api/keepalive"
+          echo
+          echo "Keep-alive OK"

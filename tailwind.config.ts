@@ -9,50 +9,54 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        navy: {
-          DEFAULT: "#0A0E1A",
-          deep: "#0c0e17",
-          surface: "#11131c",
-          card: "#1a1b25",
-          elevated: "#1e1f29",
-          high: "#282933",
-          highest: "#33343f",
+        bg: {
+          DEFAULT: "#0A0C10",
+          deep: "#0c0e12",
+          surface: "#111318",
+          card: "#1a1c20",
+          elevated: "#1e2024",
+          high: "#282a2e",
+          highest: "#333539",
         },
-        electric: {
-          DEFAULT: "#0038EC",
-          light: "#bac3ff",
-          soft: "#bdc5ff",
-          dim: "#1d46f6",
+        cyan: {
+          DEFAULT: "#00E5FF",
+          soft: "#c3f5ff",
+          dim: "#00daf3",
+          deep: "#00363d",
         },
         ink: {
-          DEFAULT: "#e2e1ef",
-          muted: "#c4c5d9",
-          dim: "#8e8fa2",
+          DEFAULT: "#e2e2e8",
+          muted: "#bac9cc",
+          dim: "#849396",
         },
         outline: {
-          DEFAULT: "#8e8fa2",
-          variant: "#444656",
+          DEFAULT: "#849396",
+          variant: "#3b494c",
         },
-        accent: {
-          coral: "#ffb4a5",
+        indigo: {
+          soft: "#bdc2ff",
+          deep: "#343d96",
         },
       },
       fontFamily: {
-        display: ["var(--font-space-grotesk)", "system-ui", "sans-serif"],
-        body: ["var(--font-archivo)", "system-ui", "sans-serif"],
-        mono: ["var(--font-jetbrains)", "ui-monospace", "monospace"],
+        display: ["var(--font-hanken)", "system-ui", "sans-serif"],
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+      },
+      borderRadius: {
+        btn: "12px",
+        card: "16px",
+        panel: "24px",
       },
       maxWidth: {
-        container: "1280px",
-      },
-      spacing: {
-        "margin-mobile": "16px",
-        "margin-desktop": "64px",
-        gutter: "24px",
+        container: "1200px",
       },
       boxShadow: {
-        hard: "4px 4px 0px 0px #0038EC",
-        "hard-light": "4px 4px 0px 0px #bac3ff",
+        glow: "0 0 15px rgba(0, 229, 255, 0.2)",
+        "glow-lg": "0 0 28px rgba(0, 229, 255, 0.28)",
+      },
+      spacing: {
+        "page-x": "16px",
+        "page-x-md": "40px",
       },
     },
   },

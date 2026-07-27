@@ -1,43 +1,101 @@
 import Link from "next/link";
 
 export function Footer() {
+  const year = new Date().getFullYear();
+  const x = process.env.NEXT_PUBLIC_FBC_X_LINK || "https://x.com";
+  const tg = process.env.NEXT_PUBLIC_FBC_TG_LINK || "https://t.me";
+
   return (
-    <footer className="mt-auto w-full border-t-2 border-outline-variant bg-navy-deep">
-      <div className="mx-auto flex w-full max-w-container flex-col items-center justify-between gap-6 px-margin-mobile py-8 md:flex-row md:px-margin-desktop">
-        <div className="flex items-center gap-2">
-          <span className="font-display text-xl font-bold tracking-widest text-electric-light uppercase">
-            FBC × Ledger
-          </span>
+    <footer className="mt-auto w-full border-t border-white/10 bg-bg-deep">
+      <div className="mx-auto flex w-full max-w-container flex-col gap-8 px-page-x py-10 md:flex-row md:items-start md:justify-between md:px-page-x-md">
+        <div className="max-w-sm space-y-3">
+          <p className="font-display text-xl font-bold text-ink">FBC</p>
+          <p className="text-base leading-relaxed text-ink">
+            FUTO Blockchain Club — building community, skills, and on-chain culture
+            at the Federal University of Technology, Owerri.
+          </p>
         </div>
-        <div className="flex flex-wrap justify-center gap-6 font-mono text-xs uppercase tracking-widest">
-          <Link href="/signup" className="text-ink-dim hover:text-electric-light transition-colors">
-            Join
-          </Link>
-          <Link
-            href="/leaderboard"
-            className="text-ink-dim hover:text-electric-light transition-colors"
-          >
-            Leaderboard
-          </Link>
-          <a
-            href={process.env.NEXT_PUBLIC_FBC_X_LINK || "https://x.com"}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-ink-dim hover:text-electric-light transition-colors"
-          >
-            X / Twitter
-          </a>
-          <a
-            href={process.env.NEXT_PUBLIC_FBC_TG_LINK || "https://t.me"}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-ink-dim hover:text-electric-light transition-colors"
-          >
-            Telegram
-          </a>
+
+        <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
+          <div>
+            <p className="label-caps mb-3">Explore</p>
+            <ul className="space-y-2 text-sm text-ink-muted">
+              <li>
+                <Link href="/" className="hover:text-cyan transition-colors">
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link href="/hall-of-fame" className="hover:text-cyan transition-colors">
+                  Hall of Fame
+                </Link>
+              </li>
+              <li>
+                <Link href="/team" className="hover:text-cyan transition-colors">
+                  Team
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <p className="label-caps mb-3">Campaigns</p>
+            <ul className="space-y-2 text-sm text-ink-muted">
+              <li>
+                <Link
+                  href="/ledger-contest"
+                  className="hover:text-cyan transition-colors"
+                >
+                  Ledger Contest
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/ledger-contest/leaderboard"
+                  className="hover:text-cyan transition-colors"
+                >
+                  Leaderboard
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/ledger-contest/signup"
+                  className="hover:text-cyan transition-colors"
+                >
+                  Sign up
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <p className="label-caps mb-3">Socials</p>
+            <ul className="space-y-2 text-sm text-ink-muted">
+              <li>
+                <a
+                  href={x}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-cyan transition-colors"
+                >
+                  X / Twitter
+                </a>
+              </li>
+              <li>
+                <a
+                  href={tg}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-cyan transition-colors"
+                >
+                  Telegram
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
-        <p className="font-mono text-[10px] uppercase tracking-wider text-ink-dim opacity-80">
-          © {new Date().getFullYear()} FUTO Blockchain Club. Contest ends Aug 1.
+      </div>
+      <div className="border-t border-white/5 px-page-x py-4 md:px-page-x-md">
+        <p className="mx-auto max-w-container text-center text-xs text-ink-dim md:text-left">
+          © {year} FUTO Blockchain Club. All rights reserved.
         </p>
       </div>
     </footer>

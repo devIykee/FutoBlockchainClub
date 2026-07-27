@@ -65,7 +65,7 @@ export async function GET() {
     if (!total_participants) {
       const { count } = await supabase
         .from("signups")
-        .select("*", { count: "exact", head: true });
+        .select("id", { count: "exact", head: true });
       total_participants = count || 0;
     }
 

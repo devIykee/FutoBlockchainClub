@@ -13,7 +13,9 @@ export async function GET() {
     const supabase = getSupabaseAdmin();
     const { data, error } = await supabase
       .from("signups")
-      .select("*")
+      .select(
+        "id, full_name, department, level, niche, skill_level, x_handle, telegram_username, ref_code, referred_by, joined_ledger, joined_fbc, followed_x, created_at"
+      )
       .order("created_at", { ascending: false });
 
     if (error) {
