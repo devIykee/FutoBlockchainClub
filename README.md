@@ -44,10 +44,13 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 ADMIN_PASSWORD=
-NEXT_PUBLIC_LEDGER_TG_LINK=
-NEXT_PUBLIC_FBC_TG_LINK=
-NEXT_PUBLIC_FBC_X_LINK=
+NEXT_PUBLIC_LEDGER_TG_LINK=   # Ledger Next Telegram invite
+NEXT_PUBLIC_FBC_TG_LINK=      # FBC Telegram invite
+NEXT_PUBLIC_FBC_X_LINK=       # e.g. https://x.com/BlockchainFUTO
+NEXT_PUBLIC_FBC_WA_LINK=      # FBC WhatsApp community (optional, footer)
 ```
+
+Defaults for community links also live in `src/lib/socials.ts` so local builds work if env is incomplete.
 
 ### Database
 

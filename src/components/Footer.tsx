@@ -1,9 +1,8 @@
 import Link from "next/link";
+import { SOCIAL_LINKS } from "@/lib/socials";
 
 export function Footer() {
   const year = new Date().getFullYear();
-  const x = process.env.NEXT_PUBLIC_FBC_X_LINK || "https://x.com";
-  const tg = process.env.NEXT_PUBLIC_FBC_TG_LINK || "https://t.me";
 
   return (
     <footer className="mt-auto w-full border-t border-white/10 bg-bg-deep">
@@ -71,7 +70,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-ink-muted">
               <li>
                 <a
-                  href={x}
+                  href={SOCIAL_LINKS.fbcX}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-cyan transition-colors"
@@ -81,12 +80,22 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href={tg}
+                  href={SOCIAL_LINKS.fbcTelegram}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-cyan transition-colors"
                 >
                   Telegram
+                </a>
+              </li>
+              <li>
+                <a
+                  href={SOCIAL_LINKS.fbcWhatsApp}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-cyan transition-colors"
+                >
+                  WhatsApp
                 </a>
               </li>
             </ul>

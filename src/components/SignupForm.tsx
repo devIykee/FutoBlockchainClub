@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LEVELS, NICHES, SKILL_LEVELS } from "@/lib/constants";
+import { SOCIAL_LINKS } from "@/lib/socials";
 import { readStoredRef } from "./RefCapture";
 
 type SocialKey = "ledger" | "fbc" | "x";
@@ -11,44 +12,31 @@ const socials: {
   key: SocialKey;
   label: string;
   action: string;
-  env: string;
-  fallback: string;
+  href: string;
   checkbox: string;
 }[] = [
   {
     key: "ledger",
     label: "Join Ledger community",
     action: "Open Telegram",
-    env: "NEXT_PUBLIC_LEDGER_TG_LINK",
-    fallback: "https://t.me",
+    href: SOCIAL_LINKS.ledgerTelegram,
     checkbox: "I've joined Ledger TG",
   },
   {
     key: "fbc",
     label: "Join FBC",
-    action: "Open FBC link",
-    env: "NEXT_PUBLIC_FBC_TG_LINK",
-    fallback: "https://t.me",
+    action: "Open FBC Telegram",
+    href: SOCIAL_LINKS.fbcTelegram,
     checkbox: "I've joined FBC",
   },
   {
     key: "x",
     label: "Follow FBC on X",
     action: "Open X",
-    env: "NEXT_PUBLIC_FBC_X_LINK",
-    fallback: "https://x.com",
+    href: SOCIAL_LINKS.fbcX,
     checkbox: "I've followed FBC on X",
   },
 ];
-
-function linkFor(env: string, fallback: string) {
-  const map: Record<string, string | undefined> = {
-    NEXT_PUBLIC_LEDGER_TG_LINK: process.env.NEXT_PUBLIC_LEDGER_TG_LINK,
-    NEXT_PUBLIC_FBC_TG_LINK: process.env.NEXT_PUBLIC_FBC_TG_LINK,
-    NEXT_PUBLIC_FBC_X_LINK: process.env.NEXT_PUBLIC_FBC_X_LINK,
-  };
-  return map[env] || fallback;
-}
 
 export function SignupForm() {
   const router = useRouter();
@@ -76,8 +64,8 @@ export function SignupForm() {
     [checked]
   );
 
-  function openSocial(key: SocialKey, env: string, fallback: string) {
-    window.open(linkFor(env, fallback), "_blank", "noopener,noreferrer");
+  function openSocial(key: SocialKey, href: string) {
+    window.open(href, "_blank", "noopener,noreferrer");
     setClicked((c) => ({ ...c, [key]: true }));
   }
 
@@ -195,10 +183,10 @@ export function SignupForm() {
               </div>
               <button
                 type="button"
-                onClick={() => openSocial(s.key, s.env, s.fallback)}
+                onClick={() => openSocial(s.key, s.href)}
                 className="btn-secondary mt-4 w-full"
               >
-                {s.action} →
+                {s.action}
               </button>
             </div>
           ))}
