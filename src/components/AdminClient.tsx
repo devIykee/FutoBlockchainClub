@@ -115,6 +115,7 @@ export function AdminClient() {
       "level",
       "niche",
       "skill_level",
+      "phone",
       "x_handle",
       "telegram_username",
       "ref_code",
@@ -322,6 +323,7 @@ function SignupsPanel({
                 "Level",
                 "Niche",
                 "Skill",
+                "Phone",
                 "X",
                 "TG",
                 "Ref",
@@ -336,12 +338,13 @@ function SignupsPanel({
           </thead>
           <tbody>
             {filtered.map((r) => (
-              <tr key={r.id} className="border-b border-white/5 text-ink hover:bg-white/[0.02]">
+              <tr key={r.id} className="border-b border-white/5 text-ink hover:bg-bg-high">
                 <td className="px-3 py-3 whitespace-nowrap font-medium">{r.full_name}</td>
                 <td className="px-3 py-3 whitespace-nowrap">{r.department}</td>
                 <td className="px-3 py-3">{r.level}</td>
                 <td className="px-3 py-3 whitespace-nowrap">{r.niche}</td>
                 <td className="px-3 py-3">{r.skill_level}</td>
+                <td className="px-3 py-3 text-xs whitespace-nowrap">{r.phone || "—"}</td>
                 <td className="px-3 py-3 text-xs">@{r.x_handle}</td>
                 <td className="px-3 py-3 text-xs">@{r.telegram_username}</td>
                 <td className="px-3 py-3 text-xs text-cyan">{r.ref_code}</td>
@@ -353,7 +356,7 @@ function SignupsPanel({
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={10} className="px-3 py-10 text-center text-ink-muted">
+                <td colSpan={11} className="px-3 py-10 text-center text-ink-muted">
                   No signups match the current filters.
                 </td>
               </tr>
@@ -369,6 +372,7 @@ function SignupsPanel({
             <p className="text-ink-muted">
               {r.department} · Level {r.level}
             </p>
+            <p className="text-xs text-ink-dim">{r.phone || "No phone"}</p>
             <p className="text-cyan">ref: {r.ref_code}</p>
           </div>
         ))}

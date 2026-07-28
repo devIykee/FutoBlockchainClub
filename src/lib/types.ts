@@ -5,6 +5,7 @@ export type Signup = {
   level: string;
   niche: string;
   skill_level: string;
+  phone: string;
   x_handle: string;
   telegram_username: string;
   ref_code: string;
