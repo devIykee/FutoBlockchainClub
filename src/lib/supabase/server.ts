@@ -14,7 +14,7 @@ export function getSupabaseServer(): SupabaseClient {
   });
 }
 
-/** Service-role client - server only, never expose to the browser. */
+/** Service-role client — server only, never expose to the browser. */
 export function getSupabaseAdmin(): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;

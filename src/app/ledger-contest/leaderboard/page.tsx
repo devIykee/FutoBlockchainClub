@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { LeaderboardClient } from "./LeaderboardClient";
+import { LeaderboardClient } from "@/components/LeaderboardClient";
 
 export const metadata: Metadata = {
   title: "Leaderboard · Ledger Contest",

@@ -5,8 +5,8 @@ type LogoProps = {
   size?: number;
   className?: string;
   /**
-   * mark - brand blue square with white FBC (source logo; best for nav/favicon contexts)
-   * wordmark - white SVG letterforms on transparent (dark backgrounds)
+   * mark — brand blue square with white FBC (source logo; best for nav/favicon contexts)
+   * wordmark — white SVG letterforms on transparent (dark backgrounds)
    */
   variant?: "mark" | "wordmark";
   priority?: boolean;

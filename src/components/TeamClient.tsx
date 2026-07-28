@@ -24,7 +24,7 @@ export function TeamClient() {
           Core team
         </h1>
         <p className="mt-4 text-base leading-relaxed text-ink">
-          The organizers and core members who keep FBC running - events, community, and
+          The organizers and core members who keep FBC running — events, community, and
           campaigns.
         </p>
       </div>
