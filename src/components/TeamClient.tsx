@@ -9,7 +9,7 @@ export function TeamClient() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/team")
+    fetch("/api/team", { cache: "no-store" })
       .then((r) => r.json())
       .then((d) => setMembers(d.members || []))
       .catch(() => setMembers([]))
@@ -31,6 +31,12 @@ export function TeamClient() {
 
       {loading && (
         <p className="mt-10 text-sm text-ink-muted">Loading team…</p>
+      )}
+
+      {!loading && members.length === 0 && (
+        <p className="mt-12 text-ink-muted">
+          Team roster will appear here once published by admins.
+        </p>
       )}
 
       <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

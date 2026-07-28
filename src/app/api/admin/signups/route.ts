@@ -22,7 +22,10 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ signups: data || [] });
+    return NextResponse.json(
+      { signups: data || [] },
+      { headers: { "Cache-Control": "no-store" } }
+    );
   } catch (e) {
     return NextResponse.json(
       { error: e instanceof Error ? e.message : "Server error" },

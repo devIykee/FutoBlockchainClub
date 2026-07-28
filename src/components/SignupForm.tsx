@@ -13,6 +13,12 @@ import {
   writeSocialVerify,
   type SocialKey,
 } from "@/lib/social-verify-storage";
+import {
+  readSignupSession,
+  writeSignupSession,
+  type SignupSession,
+} from "@/lib/signup-session";
+import { RegistrationPanel } from "@/components/RegistrationPanel";
 import { readStoredRef } from "./RefCapture";
 
 const socials: {
@@ -48,6 +54,8 @@ const socials: {
 export function SignupForm() {
   const router = useRouter();
   const [referredBy, setReferredBy] = useState<string | null>(null);
+  const [session, setSession] = useState<SignupSession | null>(null);
+  const [sessionReady, setSessionReady] = useState(false);
   const [clicked, setClicked] = useState<Record<SocialKey, boolean>>({
     ledger: false,
     fbc: false,
@@ -65,9 +73,10 @@ export function SignupForm() {
 
   useEffect(() => {
     setReferredBy(readStoredRef());
+    setSession(readSignupSession());
+    setSessionReady(true);
     const saved = readSocialVerify();
     setClicked(saved.clicked);
-    // Only restore checks for links that were already opened
     setChecked({
       ledger: saved.clicked.ledger && saved.checked.ledger,
       fbc: saved.clicked.fbc && saved.checked.fbc,
@@ -163,7 +172,32 @@ export function SignupForm() {
         body: JSON.stringify(payload),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Signup failed");
+      if (!res.ok) {
+        // Already registered — guide them to phone recovery
+        if (res.status === 409 && /phone/i.test(String(data.error || ""))) {
+          throw new Error(
+            `${data.error} Use “Recover your referral link” above with this phone number.`
+          );
+        }
+        throw new Error(data.error || "Signup failed");
+      }
+
+      const next: SignupSession = {
+        ref_code: data.ref_code,
+        full_name: payload.full_name,
+        phone: payload.phone,
+        department: payload.department,
+        level: payload.level,
+        niche: payload.niche,
+        skill_level: payload.skill_level,
+        x_handle: payload.x_handle,
+        telegram_username: payload.telegram_username,
+        referred_by: payload.referred_by,
+        referral_count: 0,
+        saved_at: new Date().toISOString(),
+      };
+      writeSignupSession(next);
+      setSession(next);
       clearSocialVerify();
       router.push(
         `/ledger-contest/thank-you?ref=${encodeURIComponent(data.ref_code)}`
@@ -174,8 +208,27 @@ export function SignupForm() {
     }
   }
 
+  if (!sessionReady) {
+    return (
+      <div className="mx-auto w-full max-w-xl py-16 text-center text-sm text-ink-muted">
+        Loading…
+      </div>
+    );
+  }
+
+  // Already registered on this device — show portal, not the form
+  if (session) {
+    return (
+      <div className="mx-auto w-full max-w-xl space-y-6">
+        <RegistrationPanel session={session} onSession={setSession} />
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto w-full max-w-xl space-y-10">
+      <RegistrationPanel session={null} onSession={setSession} />
+
       <section className="space-y-4">
         <div>
           <p className="label-caps text-cyan">Verification</p>
@@ -293,8 +346,8 @@ export function SignupForm() {
             type="tel"
           />
           <p className="-mt-3 text-xs text-ink-dim">
-            Used once per person to prevent multi-account referral abuse. NG numbers
-            preferred (e.g. 080… or +234…).
+            Used once per person to prevent multi-account referral abuse, and to recover
+            your link later. NG numbers preferred (e.g. 080… or +234…).
           </p>
           <Field
             label="X (Twitter) handle"

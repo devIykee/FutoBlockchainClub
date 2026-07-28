@@ -19,13 +19,13 @@ Official public website for **FutoBlockchainClub** (FUTO Blockchain Club / FBC).
 | Route | Description |
 |-------|-------------|
 | `/` | Club home — identity, what we do, contest teaser |
-| `/hall-of-fame` | $100+ bounty/hackathon wins (`src/content/hall-of-fame.ts`) |
-| `/team` | Core team (`src/content/team.ts`) |
+| `/hall-of-fame` | $100+ bounty/hackathon wins (managed in `/admin`) |
+| `/team` | Core team (managed in `/admin`) |
 | `/ledger-contest` | Contest hub |
 | `/ledger-contest/signup` | Signup + social click-gate |
 | `/ledger-contest/thank-you` | Personal referral link + share |
 | `/ledger-contest/leaderboard` | Anonymized live rankings (poll ~45s) |
-| `/admin` | Password-gated signups + CSV export |
+| `/admin` | Signups, Team CRUD + photo upload, Hall of Fame CRUD |
 | `/api/keepalive` | Lightweight Supabase free-tier keep-alive |
 
 Legacy paths `/signup`, `/thank-you`, `/leaderboard` redirect into `/ledger-contest/*`.
@@ -94,10 +94,13 @@ In the GitHub repo, add secret **`SITE_URL`** (e.g. `https://your-deployment.ver
 
 Leaderboard polls every **45s** (single interval, no Realtime fan-out). Admin loads once with a manual **Refresh** button.
 
-## Content you edit in code
+## Content you manage in Admin
 
-- **Team:** `src/content/team.ts`
-- **Hall of Fame:** `src/content/hall-of-fame.ts` (only $100+ prizes)
+- **Team & photos:** `/admin` → Team tab (Supabase `team_members` + Storage `media`)
+- **Hall of Fame:** `/admin` → Hall of Fame tab (prizes ≥ $100)
+- **Signups:** `/admin` → Signups tab + CSV export
+
+Public pages load live from the database (no demo seed fallback).
 
 ## Assumptions
 
@@ -107,7 +110,7 @@ Leaderboard polls every **45s** (single interval, no Realtime fan-out). Admin lo
 - Admin: shared password + httpOnly session cookie
 - Contest end: August 1, 2026 (WAT)
 - Social verification: click-gated self-attestation only
-- Hall of Fame / Team: static typed arrays (not CMS/DB)
+- Hall of Fame / Team: database via admin panel
 
 ## Ownership
 

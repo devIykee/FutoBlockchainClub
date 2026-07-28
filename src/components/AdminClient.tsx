@@ -24,7 +24,7 @@ export function AdminClient() {
   const [refreshing, setRefreshing] = useState(false);
 
   const checkAuth = useCallback(async () => {
-    const res = await fetch("/api/admin/signups");
+    const res = await fetch("/api/admin/signups", { cache: "no-store" });
     if (res.status === 401) {
       setAuthed(false);
       return false;
@@ -45,9 +45,9 @@ export function AdminClient() {
       if (!ok) return;
 
       const [sRes, tRes, hRes] = await Promise.all([
-        fetch("/api/admin/signups"),
-        fetch("/api/admin/team"),
-        fetch("/api/admin/hall-of-fame"),
+        fetch("/api/admin/signups", { cache: "no-store" }),
+        fetch("/api/admin/team", { cache: "no-store" }),
+        fetch("/api/admin/hall-of-fame", { cache: "no-store" }),
       ]);
 
       if (sRes.ok) {
@@ -583,8 +583,8 @@ function TeamPanel({
         ))}
         {members.length === 0 && (
           <p className="text-sm text-ink-muted">
-            No team members in the database yet. Add the first one — the public Team page
-            will use these instead of seed data.
+            No team members yet. Add people here — the public Team page shows only what
+            you save (no demo placeholders).
           </p>
         )}
       </div>

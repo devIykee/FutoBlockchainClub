@@ -20,10 +20,11 @@ export default function ContestThankYouPage({
           Missing referral code
         </h1>
         <p className="mt-3 text-base leading-relaxed text-ink">
-          Complete signup first to get your personal link.
+          Complete signup first, or recover your registration with the phone number
+          you used.
         </p>
         <Link href="/ledger-contest/signup" className="btn-primary mt-8 inline-flex">
-          Go to signup
+          Recover or sign up
         </Link>
       </div>
     );

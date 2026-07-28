@@ -6,6 +6,8 @@ export const REF_COOKIE_NAME = "fbc_ref";
 export const ADMIN_COOKIE_NAME = "fbc_admin_session";
 /** Persists signup social click + checkbox state across refresh */
 export const SOCIAL_VERIFY_STORAGE_KEY = "fbc_social_verify";
+/** Remembers this device's contest registration (ref + profile snapshot) */
+export const SIGNUP_SESSION_KEY = "fbc_signup_session";
 
 /** Leaderboard poll interval — free-tier friendly. */
 export const LEADERBOARD_POLL_MS = 45_000;

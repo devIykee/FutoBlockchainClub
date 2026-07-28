@@ -9,7 +9,7 @@ export function HallOfFameClient() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/hall-of-fame")
+    fetch("/api/hall-of-fame", { cache: "no-store" })
       .then((r) => r.json())
       .then((d) => setEntries(d.entries || []))
       .catch(() => setEntries([]))
