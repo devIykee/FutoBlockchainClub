@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { FBCLogo } from "./FBCLogo";
 import { X, MessageCircle, Mail } from "lucide-react";
 import { SOCIAL_LINKS } from "@/lib/socials";
 
