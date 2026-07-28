@@ -9,7 +9,7 @@ export type TeamMember = {
 };
 
 /**
- * Core team / leadership - edit this file to update the Team page.
+ * Core team / leadership — edit this file to update the Team page.
  * Not database-backed (fast-path; can move to CMS/DB later).
  */
 export const TEAM: TeamMember[] = [

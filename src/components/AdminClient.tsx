@@ -147,7 +147,7 @@ export function AdminClient() {
 
   if (authed === null) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center text-sm text-gray-500 dark:text-gray-400">
+      <div className="flex min-h-[60vh] items-center justify-center text-sm text-ink-muted">
         Checking session…
       </div>
     );
@@ -155,26 +155,26 @@ export function AdminClient() {
 
   if (!authed) {
     return (
-      <div className="flex min-h-[70vh] items-center justify-center px-4 py-12">
-        <form onSubmit={login} className="w-full max-w-md bg-white dark:bg-gray-950 rounded-xl p-8 shadow-lg border border-gray-200 dark:border-gray-800">
-          <p className="text-sm font-semibold uppercase tracking-widest text-blue-600 dark:text-blue-400">Secure access</p>
-          <h1 className="mt-2 text-3xl font-bold text-gray-900 dark:text-white">Admin</h1>
-          <p className="mt-2 text-base leading-relaxed text-gray-600 dark:text-gray-400">
+      <div className="flex min-h-[70vh] items-center justify-center px-4">
+        <form onSubmit={login} className="glass-strong w-full max-w-md rounded-panel p-8">
+          <p className="label-caps">Secure access</p>
+          <h1 className="mt-2 font-display text-3xl font-bold text-ink">Admin</h1>
+          <p className="mt-2 text-base leading-relaxed text-ink">
             Enter the admin password to manage contest signups, team, and Hall of Fame.
           </p>
           <label className="mt-8 block space-y-1.5">
-            <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Password</span>
+            <span className="label-caps">Password</span>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-2 mt-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="field-input"
               autoComplete="current-password"
             />
           </label>
-          {loginError && <p className="mt-3 text-sm text-red-600 dark:text-red-400">{loginError}</p>}
-          <button type="submit" className="mt-6 w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2">
+          {loginError && <p className="mt-3 text-sm text-danger">{loginError}</p>}
+          <button type="submit" className="btn-primary mt-6 w-full">
             Sign in
           </button>
         </form>
@@ -189,45 +189,45 @@ export function AdminClient() {
   ];
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-10 md:py-12">
+    <div className="mx-auto w-full max-w-container page-pad py-10 md:py-12">
       <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-widest text-blue-600 dark:text-blue-400">Admin</p>
-          <h1 className="mt-1 text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+          <p className="label-caps">Admin</p>
+          <h1 className="mt-1 font-display text-3xl font-bold text-ink">Dashboard</h1>
         </div>
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
             onClick={loadAll}
             disabled={refreshing}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center gap-2"
+            className="btn-secondary"
           >
             <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
             {refreshing ? "Refreshing…" : "Refresh"}
           </button>
           {tab === "signups" && (
-            <button type="button" onClick={exportCsv} className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors flex items-center gap-2">
+            <button type="button" onClick={exportCsv} className="btn-secondary">
               <Download className="h-4 w-4" />
               Export CSV
             </button>
           )}
-          <button type="button" onClick={logout} className="px-4 py-2 border border-red-300 dark:border-red-600 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors flex items-center gap-2">
+          <button type="button" onClick={logout} className="btn-secondary">
             <LogOut className="h-4 w-4" />
             Logout
           </button>
         </div>
       </div>
 
-      <div className="mb-6 flex flex-wrap gap-2 border-b border-gray-200 dark:border-gray-800 pb-3">
+      <div className="mb-6 flex flex-wrap gap-2 border-b border-white/10 pb-3">
         {tabs.map((t) => (
           <button
             key={t.id}
             type="button"
             onClick={() => setTab(t.id)}
-            className={`px-4 py-2 text-sm font-medium min-h-[44px] rounded-lg transition-colors ${
+            className={`rounded-btn px-4 py-2 text-sm font-medium min-h-[44px] transition-colors ${
               tab === t.id
-                ? "bg-blue-600 text-white"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                ? "bg-cyan/15 text-cyan"
+                : "text-ink-muted hover:bg-white/5 hover:text-ink"
             }`}
           >
             {t.label}
@@ -235,7 +235,7 @@ export function AdminClient() {
         ))}
       </div>
 
-      {loadError && <p className="mb-4 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg">{loadError}</p>}
+      {loadError && <p className="mb-4 alert-danger">{loadError}</p>}
 
       {tab === "signups" && (
         <SignupsPanel
@@ -281,7 +281,7 @@ function SignupsPanel({
         <select
           value={nicheFilter}
           onChange={(e) => setNicheFilter(e.target.value)}
-          className="w-auto min-w-[140px] px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="field-input w-auto min-w-[140px]"
         >
           <option value="">All niches</option>
           {NICHES.map((n) => (
@@ -293,7 +293,7 @@ function SignupsPanel({
         <select
           value={levelFilter}
           onChange={(e) => setLevelFilter(e.target.value)}
-          className="w-auto min-w-[120px] px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="field-input w-auto min-w-[120px]"
         >
           <option value="">All levels</option>
           {LEVELS.map((n) => (
@@ -305,17 +305,17 @@ function SignupsPanel({
         <select
           value={sortKey}
           onChange={(e) => setSortKey(e.target.value as "created_at" | "full_name")}
-          className="w-auto min-w-[140px] px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="field-input w-auto min-w-[140px]"
         >
           <option value="created_at">Sort: newest</option>
           <option value="full_name">Sort: name</option>
         </select>
       </div>
 
-      <div className="hidden overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800 md:block">
+      <div className="hidden overflow-x-auto rounded-card border border-white/10 md:block">
         <table className="w-full min-w-[1100px] text-left text-sm">
           <thead>
-            <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+            <tr className="border-b border-white/10 bg-bg-card label-caps">
               {[
                 "Name",
                 "Dept",
@@ -328,7 +328,7 @@ function SignupsPanel({
                 "By",
                 "Created",
               ].map((h) => (
-                <th key={h} className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                <th key={h} className="px-3 py-3">
                   {h}
                 </th>
               ))}
@@ -336,24 +336,24 @@ function SignupsPanel({
           </thead>
           <tbody>
             {filtered.map((r) => (
-              <tr key={r.id} className="border-b border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                <td className="px-4 py-3 whitespace-nowrap font-medium">{r.full_name}</td>
-                <td className="px-4 py-3 whitespace-nowrap">{r.department}</td>
-                <td className="px-4 py-3">{r.level}</td>
-                <td className="px-4 py-3 whitespace-nowrap">{r.niche}</td>
-                <td className="px-4 py-3">{r.skill_level}</td>
-                <td className="px-4 py-3 text-xs">@{r.x_handle}</td>
-                <td className="px-4 py-3 text-xs">@{r.telegram_username}</td>
-                <td className="px-4 py-3 text-xs text-blue-600 dark:text-blue-400">{r.ref_code}</td>
-                <td className="px-4 py-3 text-xs">{r.referred_by || "-"}</td>
-                <td className="px-4 py-3 text-xs whitespace-nowrap">
+              <tr key={r.id} className="border-b border-white/5 text-ink hover:bg-white/[0.02]">
+                <td className="px-3 py-3 whitespace-nowrap font-medium">{r.full_name}</td>
+                <td className="px-3 py-3 whitespace-nowrap">{r.department}</td>
+                <td className="px-3 py-3">{r.level}</td>
+                <td className="px-3 py-3 whitespace-nowrap">{r.niche}</td>
+                <td className="px-3 py-3">{r.skill_level}</td>
+                <td className="px-3 py-3 text-xs">@{r.x_handle}</td>
+                <td className="px-3 py-3 text-xs">@{r.telegram_username}</td>
+                <td className="px-3 py-3 text-xs text-cyan">{r.ref_code}</td>
+                <td className="px-3 py-3 text-xs">{r.referred_by || "—"}</td>
+                <td className="px-3 py-3 text-xs whitespace-nowrap">
                   {new Date(r.created_at).toLocaleString()}
                 </td>
               </tr>
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={10} className="px-4 py-10 text-center text-gray-500 dark:text-gray-400">
+                <td colSpan={10} className="px-3 py-10 text-center text-ink-muted">
                   No signups match the current filters.
                 </td>
               </tr>
@@ -364,12 +364,12 @@ function SignupsPanel({
 
       <div className="space-y-3 md:hidden">
         {filtered.map((r) => (
-          <div key={r.id} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 text-sm">
-            <p className="text-lg font-semibold text-gray-900 dark:text-white">{r.full_name}</p>
-            <p className="text-gray-600 dark:text-gray-400">
+          <div key={r.id} className="card-surface space-y-2 !p-4 text-sm">
+            <p className="font-display text-lg font-semibold text-ink">{r.full_name}</p>
+            <p className="text-ink-muted">
               {r.department} · Level {r.level}
             </p>
-            <p className="text-blue-600 dark:text-blue-400">ref: {r.ref_code}</p>
+            <p className="text-cyan">ref: {r.ref_code}</p>
           </div>
         ))}
       </div>
@@ -459,8 +459,8 @@ function TeamPanel({
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
-      <form onSubmit={save} className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl p-6 lg:col-span-2 space-y-4">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+      <form onSubmit={save} className="card-surface lg:col-span-2 space-y-4">
+        <h2 className="font-display text-lg font-semibold text-ink">
           {editId ? "Edit member" : "Add member"}
         </h2>
         <Field
@@ -503,12 +503,12 @@ function TeamPanel({
           inputMode="numeric"
         />
         <div className="flex flex-wrap gap-2 pt-2">
-          <button type="submit" disabled={saving} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg font-semibold transition-colors flex items-center gap-2">
+          <button type="submit" disabled={saving} className="btn-primary">
             <Plus className="h-4 w-4" />
             {saving ? "Saving…" : editId ? "Update" : "Add member"}
           </button>
           {editId && (
-            <button type="button" onClick={cancelEdit} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+            <button type="button" onClick={cancelEdit} className="btn-secondary">
               Cancel
             </button>
           )}
@@ -519,12 +519,12 @@ function TeamPanel({
         {members.map((m) => (
           <div
             key={m.id}
-            className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+            className="card-surface !p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
           >
             <div>
-              <p className="font-semibold text-gray-900 dark:text-white">{m.name}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{m.role}</p>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
+              <p className="font-display font-semibold text-ink">{m.name}</p>
+              <p className="text-sm text-ink-muted">{m.role}</p>
+              <p className="mt-1 text-xs text-ink-dim">
                 order {m.sort_order}
                 {m.x ? " · X" : ""}
                 {m.github ? " · GH" : ""}
@@ -532,14 +532,14 @@ function TeamPanel({
               </p>
             </div>
             <div className="flex gap-2">
-              <button type="button" onClick={() => startEdit(m)} className="px-3 py-2 border border-blue-300 dark:border-blue-600 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors flex items-center gap-1">
+              <button type="button" onClick={() => startEdit(m)} className="btn-secondary !px-3">
                 <Pencil className="h-4 w-4" />
                 Edit
               </button>
               <button
                 type="button"
                 onClick={() => remove(m.id)}
-                className="px-3 py-2 border border-red-300 dark:border-red-600 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors flex items-center gap-1"
+                className="btn-secondary !px-3 text-danger"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
@@ -547,8 +547,8 @@ function TeamPanel({
           </div>
         ))}
         {members.length === 0 && (
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            No team members in the database yet. Add the first one - the public Team page
+          <p className="text-sm text-ink-muted">
+            No team members in the database yet. Add the first one — the public Team page
             will use these instead of seed data.
           </p>
         )}
@@ -644,8 +644,8 @@ function HofPanel({
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
-      <form onSubmit={save} className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl p-6 lg:col-span-2 space-y-4">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+      <form onSubmit={save} className="card-surface lg:col-span-2 space-y-4">
+        <h2 className="font-display text-lg font-semibold text-ink">
           {editId ? "Edit entry" : "Add entry"}
         </h2>
         <Field
@@ -680,21 +680,21 @@ function HofPanel({
           onChange={(v) => setForm((f) => ({ ...f, project_url: v }))}
         />
         <label className="block space-y-1.5">
-          <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Description</span>
+          <span className="label-caps">Description</span>
           <textarea
             value={form.description}
             onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[96px]"
+            className="field-input min-h-[96px]"
             rows={3}
           />
         </label>
         <div className="flex flex-wrap gap-2 pt-2">
-          <button type="submit" disabled={saving} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg font-semibold transition-colors flex items-center gap-2">
+          <button type="submit" disabled={saving} className="btn-primary">
             <Plus className="h-4 w-4" />
             {saving ? "Saving…" : editId ? "Update" : "Add entry"}
           </button>
           {editId && (
-            <button type="button" onClick={cancelEdit} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+            <button type="button" onClick={cancelEdit} className="btn-secondary">
               Cancel
             </button>
           )}
@@ -705,24 +705,24 @@ function HofPanel({
         {entries.map((e) => (
           <div
             key={e.id}
-            className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+            className="card-surface !p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
           >
             <div>
-              <p className="font-semibold text-gray-900 dark:text-white">{e.name}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{e.achievement}</p>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
+              <p className="font-display font-semibold text-ink">{e.name}</p>
+              <p className="text-sm text-ink-muted">{e.achievement}</p>
+              <p className="mt-1 text-xs text-ink-dim">
                 ${Number(e.prize_usd).toLocaleString()} · {e.date}
               </p>
             </div>
             <div className="flex gap-2">
-              <button type="button" onClick={() => startEdit(e)} className="px-3 py-2 border border-blue-300 dark:border-blue-600 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors flex items-center gap-1">
+              <button type="button" onClick={() => startEdit(e)} className="btn-secondary !px-3">
                 <Pencil className="h-4 w-4" />
                 Edit
               </button>
               <button
                 type="button"
                 onClick={() => remove(e.id)}
-                className="px-3 py-2 border border-red-300 dark:border-red-600 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors flex items-center gap-1"
+                className="btn-secondary !px-3 text-danger"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
@@ -730,7 +730,7 @@ function HofPanel({
           </div>
         ))}
         {entries.length === 0 && (
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-ink-muted">
             No Hall of Fame entries in the database yet. Add wins of $100+ prize value.
           </p>
         )}
@@ -756,14 +756,14 @@ function Field({
 }) {
   return (
     <label className="block space-y-1.5">
-      <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{label}</span>
+      <span className="label-caps">{label}</span>
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         required={required}
         placeholder={placeholder}
         inputMode={inputMode}
-        className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="field-input"
       />
     </label>
   );

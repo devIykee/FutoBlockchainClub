@@ -10,28 +10,28 @@ export type HallOfFameEntry = {
 
 /**
  * Members with bounty/hackathon wins of $100+ prize value.
- * Edit this file to add entries - not database-backed (fast-path).
+ * Edit this file to add entries — not database-backed (fast-path).
  */
 export const HALL_OF_FAME: HallOfFameEntry[] = [
   {
     name: "Example Builder",
-    achievement: "Campus Hackathon - Best DeFi Build",
+    achievement: "Campus Hackathon — Best DeFi Build",
     prizeUsd: 500,
     date: "2025-11",
-    description: "Placeholder entry - replace with a real FBC win.",
+    description: "Placeholder entry — replace with a real FBC win.",
   },
   {
     name: "Example Builder",
     achievement: "Protocol Bounty",
     prizeUsd: 250,
     date: "2025-08",
-    description: "Placeholder entry - replace with a real FBC win.",
+    description: "Placeholder entry — replace with a real FBC win.",
   },
   {
     name: "Example Builder",
     achievement: "Open Source Contribution Award",
     prizeUsd: 150,
     date: "2025-05",
-    description: "Placeholder entry - replace with a real FBC win.",
+    description: "Placeholder entry — replace with a real FBC win.",
   },
 ];
