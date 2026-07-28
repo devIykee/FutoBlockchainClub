@@ -4,8 +4,11 @@ import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { Download, LogOut, Plus, RefreshCw, Trash2, Pencil } from "lucide-react";
 import type { HallOfFameRow, Signup, TeamMemberRow } from "@/lib/types";
 import { LEVELS, NICHES } from "@/lib/constants";
+import { ImageUploadField } from "@/components/ImageUploadField";
+import { AdminReferralsPanel } from "@/components/AdminReferralsPanel";
+import { AdminContestPanel } from "@/components/AdminContestPanel";
 
-type Tab = "signups" | "team" | "hof";
+type Tab = "signups" | "referrals" | "contest" | "team" | "hof";
 
 export function AdminClient() {
   const [authed, setAuthed] = useState<boolean | null>(null);
@@ -23,7 +26,7 @@ export function AdminClient() {
   const [refreshing, setRefreshing] = useState(false);
 
   const checkAuth = useCallback(async () => {
-    const res = await fetch("/api/admin/signups");
+    const res = await fetch("/api/admin/signups", { cache: "no-store" });
     if (res.status === 401) {
       setAuthed(false);
       return false;
@@ -44,9 +47,9 @@ export function AdminClient() {
       if (!ok) return;
 
       const [sRes, tRes, hRes] = await Promise.all([
-        fetch("/api/admin/signups"),
-        fetch("/api/admin/team"),
-        fetch("/api/admin/hall-of-fame"),
+        fetch("/api/admin/signups", { cache: "no-store" }),
+        fetch("/api/admin/team", { cache: "no-store" }),
+        fetch("/api/admin/hall-of-fame", { cache: "no-store" }),
       ]);
 
       if (sRes.ok) {
@@ -185,6 +188,8 @@ export function AdminClient() {
 
   const tabs: { id: Tab; label: string }[] = [
     { id: "signups", label: `Signups (${signups.length})` },
+    { id: "referrals", label: "Referrals" },
+    { id: "contest", label: "Contest" },
     { id: "team", label: `Team (${team.length})` },
     { id: "hof", label: `Hall of Fame (${hof.length})` },
   ];
@@ -248,6 +253,12 @@ export function AdminClient() {
           sortKey={sortKey}
           setSortKey={setSortKey}
         />
+      )}
+      {tab === "referrals" && (
+        <AdminReferralsPanel setError={setLoadError} />
+      )}
+      {tab === "contest" && (
+        <AdminContestPanel setError={setLoadError} />
       )}
       {tab === "team" && (
         <TeamPanel members={team} onChange={loadAll} setError={setLoadError} />
@@ -370,12 +381,26 @@ function SignupsPanel({
           <div key={r.id} className="card-surface space-y-2 !p-4 text-sm">
             <p className="font-display text-lg font-semibold text-ink">{r.full_name}</p>
             <p className="text-ink-muted">
-              {r.department} · Level {r.level}
+              {r.department} · Level {r.level} · {r.niche}
             </p>
             <p className="text-xs text-ink-dim">{r.phone || "No phone"}</p>
-            <p className="text-cyan">ref: {r.ref_code}</p>
+            <p className="text-xs text-ink-dim">
+              @{r.x_handle} · TG @{r.telegram_username}
+            </p>
+            <p className="text-cyan">
+              ref: {r.ref_code}
+              {r.referred_by ? ` · by ${r.referred_by}` : ""}
+            </p>
+            <p className="text-xs text-ink-dim">
+              {new Date(r.created_at).toLocaleString()}
+            </p>
           </div>
         ))}
+        {filtered.length === 0 && (
+          <p className="py-8 text-center text-sm text-ink-muted">
+            No signups match the current filters.
+          </p>
+        )}
       </div>
     </>
   );
@@ -479,11 +504,12 @@ function TeamPanel({
           onChange={(v) => setForm((f) => ({ ...f, role: v }))}
           required
         />
-        <Field
-          label="Photo URL"
+        <ImageUploadField
+          label="Photo"
           value={form.photo}
           onChange={(v) => setForm((f) => ({ ...f, photo: v }))}
-          placeholder="https://…"
+          folder="team"
+          disabled={saving}
         />
         <Field
           label="X URL"
@@ -525,15 +551,30 @@ function TeamPanel({
             key={m.id}
             className="card-surface !p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
           >
-            <div>
-              <p className="font-display font-semibold text-ink">{m.name}</p>
-              <p className="text-sm text-ink-muted">{m.role}</p>
-              <p className="mt-1 text-xs text-ink-dim">
-                order {m.sort_order}
-                {m.x ? " · X" : ""}
-                {m.github ? " · GH" : ""}
-                {m.linkedin ? " · LI" : ""}
-              </p>
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-bg-high text-xs font-bold text-ink ring-1 ring-theme">
+                {m.photo ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={m.photo} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  m.name
+                    .split(/\s+/)
+                    .map((p) => p[0])
+                    .join("")
+                    .slice(0, 2)
+                    .toUpperCase()
+                )}
+              </div>
+              <div className="min-w-0">
+                <p className="font-display font-semibold text-ink truncate">{m.name}</p>
+                <p className="text-sm text-ink-muted truncate">{m.role}</p>
+                <p className="mt-1 text-xs text-ink-dim">
+                  order {m.sort_order}
+                  {m.x ? " · X" : ""}
+                  {m.github ? " · GH" : ""}
+                  {m.linkedin ? " · LI" : ""}
+                </p>
+              </div>
             </div>
             <div className="flex gap-2">
               <button type="button" onClick={() => startEdit(m)} className="btn-secondary !px-3">
@@ -552,8 +593,8 @@ function TeamPanel({
         ))}
         {members.length === 0 && (
           <p className="text-sm text-ink-muted">
-            No team members in the database yet. Add the first one — the public Team page
-            will use these instead of seed data.
+            No team members yet. Add people here — the public Team page shows only what
+            you save (no demo placeholders).
           </p>
         )}
       </div>

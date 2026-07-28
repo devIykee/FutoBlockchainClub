@@ -9,7 +9,7 @@ export function TeamClient() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/team")
+    fetch("/api/team", { cache: "no-store" })
       .then((r) => r.json())
       .then((d) => setMembers(d.members || []))
       .catch(() => setMembers([]))
@@ -33,16 +33,23 @@ export function TeamClient() {
         <p className="mt-10 text-sm text-ink-muted">Loading team…</p>
       )}
 
+      {!loading && members.length === 0 && (
+        <p className="mt-12 text-ink-muted">
+          Team roster will appear here once published by admins.
+        </p>
+      )}
+
       <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {members.map((member) => (
           <article key={member.id} className="card-surface">
-            <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-white/5 text-sm font-bold text-ink ring-1 ring-white/10">
+            <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-bg-high text-sm font-bold text-ink ring-1 ring-theme">
               {member.photo ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={member.photo}
-                  alt=""
+                  alt={member.name}
                   className="h-full w-full object-cover"
+                  loading="lazy"
                 />
               ) : (
                 initials(member.name)

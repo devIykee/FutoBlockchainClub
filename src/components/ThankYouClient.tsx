@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -10,9 +10,33 @@ import {
   MessageCircle,
   Send,
 } from "lucide-react";
+import {
+  readSignupSession,
+  writeSignupSession,
+} from "@/lib/signup-session";
 
 export function ThankYouClient({ refCode }: { refCode: string }) {
   const [copied, setCopied] = useState(false);
+
+  // Persist registration on this device when they land with a ref code
+  useEffect(() => {
+    if (!refCode) return;
+    const existing = readSignupSession();
+    if (existing?.ref_code === refCode) return;
+    writeSignupSession({
+      ref_code: refCode,
+      full_name: existing?.full_name || "Contestant",
+      phone: existing?.phone,
+      department: existing?.department,
+      level: existing?.level,
+      niche: existing?.niche,
+      skill_level: existing?.skill_level,
+      x_handle: existing?.x_handle,
+      telegram_username: existing?.telegram_username,
+      referred_by: existing?.referred_by ?? null,
+      referral_count: existing?.referral_count,
+    });
+  }, [refCode]);
 
   const liveUrl = useMemo(() => {
     if (typeof window === "undefined") {
@@ -123,6 +147,13 @@ export function ThankYouClient({ refCode }: { refCode: string }) {
           </p>
         </div>
         <ArrowRight className="h-5 w-5 text-cyan" />
+      </Link>
+
+      <Link
+        href="/ledger-contest/signup"
+        className="mt-3 flex items-center justify-center gap-2 text-sm font-medium text-ink-muted hover:text-cyan transition-colors"
+      >
+        View my registration &amp; who I referred
       </Link>
     </div>
   );

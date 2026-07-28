@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
-import { HALL_OF_FAME } from "@/content/hall-of-fame";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
+/** Public Hall of Fame — admin-managed only (no demo seed). */
 export async function GET() {
   try {
     const supabase = getSupabaseAdmin();
@@ -17,32 +18,30 @@ export async function GET() {
 
     if (error) {
       console.error(error);
-      return NextResponse.json({ entries: seedEntries(), source: "seed" });
-    }
-
-    if (!data || data.length === 0) {
-      return NextResponse.json({ entries: seedEntries(), source: "seed" });
+      return NextResponse.json(
+        { error: error.message, entries: [] },
+        {
+          status: 500,
+          headers: { "Cache-Control": "no-store" },
+        }
+      );
     }
 
     return NextResponse.json(
-      { entries: data, source: "db" },
-      { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120" } }
+      { entries: data || [], source: "db" },
+      { headers: { "Cache-Control": "no-store" } }
     );
   } catch (e) {
     console.error(e);
-    return NextResponse.json({ entries: seedEntries(), source: "seed" });
+    return NextResponse.json(
+      {
+        error: e instanceof Error ? e.message : "Server error",
+        entries: [],
+      },
+      {
+        status: 500,
+        headers: { "Cache-Control": "no-store" },
+      }
+    );
   }
-}
-
-function seedEntries() {
-  return HALL_OF_FAME.map((e, i) => ({
-    id: `seed-${i}`,
-    name: e.name,
-    achievement: e.achievement,
-    prize_usd: e.prizeUsd,
-    date: e.date,
-    project_url: e.projectUrl ?? null,
-    description: e.description ?? null,
-    sort_order: i,
-  }));
 }

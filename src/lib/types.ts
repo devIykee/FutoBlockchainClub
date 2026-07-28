@@ -1,3 +1,10 @@
+export type ReferralStatus =
+  | "pending"
+  | "verified"
+  | "rejected"
+  | "removed"
+  | null;
+
 export type Signup = {
   id: string;
   full_name: string;
@@ -10,9 +17,27 @@ export type Signup = {
   telegram_username: string;
   ref_code: string;
   referred_by: string | null;
+  previous_referred_by?: string | null;
+  referral_status?: ReferralStatus;
+  referral_source?: string | null;
+  referral_reviewed_at?: string | null;
+  referral_reviewed_by?: string | null;
+  referral_review_reason?: string | null;
   joined_ledger: boolean;
   joined_fbc: boolean;
   followed_x: boolean;
+  created_at: string;
+};
+
+export type AdminAuditEntry = {
+  id: string;
+  admin_actor: string;
+  action: string;
+  target_signup_id: string | null;
+  target_ref_code: string | null;
+  referrer_ref_code: string | null;
+  reason: string;
+  metadata?: Record<string, unknown> | null;
   created_at: string;
 };
 

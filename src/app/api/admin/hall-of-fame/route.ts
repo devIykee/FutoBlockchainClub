@@ -16,7 +16,10 @@ export async function GET() {
     .select("*")
     .order("prize_usd", { ascending: false });
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ entries: data || [] });
+  return NextResponse.json(
+    { entries: data || [] },
+    { headers: { "Cache-Control": "no-store" } }
+  );
 }
 
 export async function POST(req: NextRequest) {

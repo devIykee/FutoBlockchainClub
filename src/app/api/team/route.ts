@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
-import { TEAM } from "@/content/team";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-/** Public list of core team members (ordered). Falls back to static seed if DB empty/unavailable. */
+/** Public list of core team members — admin-managed only (no demo seed). */
 export async function GET() {
   try {
     const supabase = getSupabaseAdmin();
@@ -16,32 +16,30 @@ export async function GET() {
 
     if (error) {
       console.error(error);
-      return NextResponse.json({ members: seedMembers(), source: "seed" });
-    }
-
-    if (!data || data.length === 0) {
-      return NextResponse.json({ members: seedMembers(), source: "seed" });
+      return NextResponse.json(
+        { error: error.message, members: [] },
+        {
+          status: 500,
+          headers: { "Cache-Control": "no-store" },
+        }
+      );
     }
 
     return NextResponse.json(
-      { members: data, source: "db" },
-      { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120" } }
+      { members: data || [], source: "db" },
+      { headers: { "Cache-Control": "no-store" } }
     );
   } catch (e) {
     console.error(e);
-    return NextResponse.json({ members: seedMembers(), source: "seed" });
+    return NextResponse.json(
+      {
+        error: e instanceof Error ? e.message : "Server error",
+        members: [],
+      },
+      {
+        status: 500,
+        headers: { "Cache-Control": "no-store" },
+      }
+    );
   }
-}
-
-function seedMembers() {
-  return TEAM.map((m, i) => ({
-    id: `seed-${i}`,
-    name: m.name,
-    role: m.role,
-    photo: m.photo ?? null,
-    x: m.x ?? null,
-    github: m.github ?? null,
-    linkedin: m.linkedin ?? null,
-    sort_order: i,
-  }));
 }

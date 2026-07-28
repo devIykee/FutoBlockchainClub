@@ -4,6 +4,7 @@ import { generateRefCode } from "@/lib/ref-code";
 import { LEVELS, NICHES, SKILL_LEVELS } from "@/lib/constants";
 import { normalizePhone } from "@/lib/phone";
 import { isValidHandle, normalizeHandle } from "@/lib/normalize-identity";
+import { getContestState } from "@/lib/contest";
 
 type Body = {
   full_name?: string;
@@ -52,6 +53,21 @@ export async function POST(req: NextRequest) {
       { error: "Too many signup attempts from this network. Try again later." },
       { status: 429 }
     );
+  }
+
+  try {
+    const contest = await getContestState();
+    if (!contest.is_open) {
+      return NextResponse.json(
+        {
+          error:
+            "Registration is closed — the contest has ended. Check the leaderboard for final rankings.",
+        },
+        { status: 403 }
+      );
+    }
+  } catch {
+    // If settings table missing, allow signup (fail open with default end date via getContestState)
   }
 
   let body: Body;
@@ -121,14 +137,6 @@ export async function POST(req: NextRequest) {
   if (!joined_ledger || !joined_fbc || !followed_x) {
     return NextResponse.json(
       { error: "Complete all social verification steps first" },
-      { status: 400 }
-    );
-  }
-
-  // Same person cannot use X handle as TG handle as a soft signal of bot spam
-  if (x_handle === telegram_username) {
-    return NextResponse.json(
-      { error: "X and Telegram usernames must be different accounts" },
       { status: 400 }
     );
   }
@@ -216,25 +224,53 @@ export async function POST(req: NextRequest) {
     let lastError: string | null = null;
 
     for (let attempt = 0; attempt < 5; attempt++) {
-      const { data, error } = await supabase
-        .from("signups")
-        .insert({
-          full_name,
-          department,
-          level,
-          niche,
-          skill_level,
-          phone,
-          x_handle,
-          telegram_username,
-          ref_code,
-          referred_by,
-          joined_ledger,
-          joined_fbc,
-          followed_x,
-        })
-        .select("ref_code")
-        .single();
+      const baseRow = {
+        full_name,
+        department,
+        level,
+        niche,
+        skill_level,
+        phone,
+        x_handle,
+        telegram_username,
+        ref_code,
+        referred_by,
+        joined_ledger,
+        joined_fbc,
+        followed_x,
+      };
+      // Prefer moderation columns; fall back if migration not yet applied
+      let data: { ref_code: string } | null = null;
+      let error: { message?: string; code?: string } | null = null;
+
+      {
+        const res = await supabase
+          .from("signups")
+          .insert({
+            ...baseRow,
+            referral_status: referred_by ? "pending" : null,
+            referral_source: referred_by ? "referral_link" : null,
+          })
+          .select("ref_code")
+          .single();
+        data = res.data;
+        error = res.error;
+      }
+
+      if (
+        error &&
+        /referral_status|referral_source|schema cache|column/i.test(
+          error.message || ""
+        )
+      ) {
+        const res = await supabase
+          .from("signups")
+          .insert(baseRow)
+          .select("ref_code")
+          .single();
+        data = res.data;
+        error = res.error;
+      }
 
       if (!error && data) {
         inserted = data;
@@ -245,7 +281,7 @@ export async function POST(req: NextRequest) {
         const msg = error.message || "";
         if (msg.includes("ref_code")) {
           ref_code = generateRefCode();
-          lastError = error.message;
+          lastError = error.message || "ref_code conflict";
           continue;
         }
         if (msg.includes("phone")) {
