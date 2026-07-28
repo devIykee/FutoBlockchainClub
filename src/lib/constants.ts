@@ -1,5 +1,11 @@
-/** Contest ends end-of-day Aug 1 (WAT). */
-export const CONTEST_END = new Date("2026-08-01T23:59:59+01:00");
+/**
+ * Default contest end (end-of-day Aug 1 WAT).
+ * Live schedule is stored in Supabase `contest_settings` and editable in Admin.
+ */
+export const CONTEST_END_DEFAULT = new Date("2026-08-01T23:59:59+01:00");
+
+/** @deprecated Prefer getContestState() / /api/contest — kept for static fallbacks */
+export const CONTEST_END = CONTEST_END_DEFAULT;
 
 export const REF_STORAGE_KEY = "fbc_ref";
 export const REF_COOKIE_NAME = "fbc_ref";

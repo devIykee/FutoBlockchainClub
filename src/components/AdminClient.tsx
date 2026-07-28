@@ -6,8 +6,9 @@ import type { HallOfFameRow, Signup, TeamMemberRow } from "@/lib/types";
 import { LEVELS, NICHES } from "@/lib/constants";
 import { ImageUploadField } from "@/components/ImageUploadField";
 import { AdminReferralsPanel } from "@/components/AdminReferralsPanel";
+import { AdminContestPanel } from "@/components/AdminContestPanel";
 
-type Tab = "signups" | "referrals" | "team" | "hof";
+type Tab = "signups" | "referrals" | "contest" | "team" | "hof";
 
 export function AdminClient() {
   const [authed, setAuthed] = useState<boolean | null>(null);
@@ -188,6 +189,7 @@ export function AdminClient() {
   const tabs: { id: Tab; label: string }[] = [
     { id: "signups", label: `Signups (${signups.length})` },
     { id: "referrals", label: "Referrals" },
+    { id: "contest", label: "Contest" },
     { id: "team", label: `Team (${team.length})` },
     { id: "hof", label: `Hall of Fame (${hof.length})` },
   ];
@@ -254,6 +256,9 @@ export function AdminClient() {
       )}
       {tab === "referrals" && (
         <AdminReferralsPanel setError={setLoadError} />
+      )}
+      {tab === "contest" && (
+        <AdminContestPanel setError={setLoadError} />
       )}
       {tab === "team" && (
         <TeamPanel members={team} onChange={loadAll} setError={setLoadError} />

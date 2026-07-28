@@ -4,6 +4,7 @@ import { generateRefCode } from "@/lib/ref-code";
 import { LEVELS, NICHES, SKILL_LEVELS } from "@/lib/constants";
 import { normalizePhone } from "@/lib/phone";
 import { isValidHandle, normalizeHandle } from "@/lib/normalize-identity";
+import { getContestState } from "@/lib/contest";
 
 type Body = {
   full_name?: string;
@@ -52,6 +53,21 @@ export async function POST(req: NextRequest) {
       { error: "Too many signup attempts from this network. Try again later." },
       { status: 429 }
     );
+  }
+
+  try {
+    const contest = await getContestState();
+    if (!contest.is_open) {
+      return NextResponse.json(
+        {
+          error:
+            "Registration is closed — the contest has ended. Check the leaderboard for final rankings.",
+        },
+        { status: 403 }
+      );
+    }
+  } catch {
+    // If settings table missing, allow signup (fail open with default end date via getContestState)
   }
 
   let body: Body;
