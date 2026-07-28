@@ -153,7 +153,7 @@ export function ThankYouClient({ refCode }: { refCode: string }) {
         href="/ledger-contest/signup"
         className="mt-3 flex items-center justify-center gap-2 text-sm font-medium text-ink-muted hover:text-cyan transition-colors"
       >
-        View my registration on this device
+        View my registration &amp; who I referred
       </Link>
     </div>
   );

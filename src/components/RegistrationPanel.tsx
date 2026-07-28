@@ -8,8 +8,10 @@ import {
   Copy,
   Link2,
   LogOut,
+  RefreshCw,
   Search,
   Trophy,
+  Users,
 } from "lucide-react";
 import type { SignupSession } from "@/lib/signup-session";
 import {
@@ -33,34 +35,46 @@ export function RegistrationPanel({
 }: Props) {
   const [phone, setPhone] = useState("");
   const [looking, setLooking] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [showRecover, setShowRecover] = useState(!session);
 
-  // Refresh referral count / profile when we already know the phone
+  async function refreshByPhone(phoneValue: string, silent = false) {
+    if (!silent) setRefreshing(true);
+    try {
+      const res = await fetch("/api/signup/lookup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: phoneValue }),
+        cache: "no-store",
+      });
+      if (!res.ok) return false;
+      const data = await res.json();
+      const reg = data.registration as SignupSession | undefined;
+      if (!reg?.ref_code) return false;
+      const next: SignupSession = {
+        ...reg,
+        saved_at: new Date().toISOString(),
+      };
+      writeSignupSession(next);
+      onSession(next);
+      return true;
+    } catch {
+      return false;
+    } finally {
+      if (!silent) setRefreshing(false);
+    }
+  }
+
+  // Refresh referrals / profile when we already know the phone
   useEffect(() => {
     if (!session?.phone) return;
     let cancelled = false;
     (async () => {
-      try {
-        const res = await fetch("/api/signup/lookup", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone: session.phone }),
-          cache: "no-store",
-        });
-        if (!res.ok || cancelled) return;
-        const data = await res.json();
-        const reg = data.registration as SignupSession | undefined;
-        if (!reg?.ref_code || cancelled) return;
-        const next: SignupSession = {
-          ...reg,
-          saved_at: new Date().toISOString(),
-        };
-        writeSignupSession(next);
-        onSession(next);
-      } catch {
-        // offline / rate limit — keep cached session
+      const ok = await refreshByPhone(session.phone!, true);
+      if (cancelled && !ok) {
+        // keep cached
       }
     })();
     return () => {
@@ -167,13 +181,60 @@ export function RegistrationPanel({
             <Fact label="Telegram" value={`@${session.telegram_username}`} />
           )}
           <Fact label="Referral code" value={session.ref_code} />
-          {typeof session.referral_count === "number" && (
-            <Fact
-              label="Successful referrals"
-              value={String(session.referral_count)}
-            />
-          )}
+          <Fact
+            label="Successful referrals"
+            value={String(
+              session.referrals?.length ?? session.referral_count ?? 0
+            )}
+          />
         </dl>
+
+        <div>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="label-caps inline-flex items-center gap-1.5">
+              <Users className="h-3.5 w-3.5" />
+              People you referred
+            </p>
+            {session.phone && (
+              <button
+                type="button"
+                onClick={() => refreshByPhone(session.phone!)}
+                disabled={refreshing}
+                className="inline-flex items-center gap-1 text-xs font-medium text-ink-muted hover:text-cyan disabled:opacity-50"
+              >
+                <RefreshCw
+                  className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`}
+                />
+                {refreshing ? "Updating…" : "Refresh"}
+              </button>
+            )}
+          </div>
+          {(session.referrals?.length ?? 0) === 0 ? (
+            <p className="mt-2 text-sm text-ink-muted">
+              Nobody has used your link yet. Share it with classmates to climb
+              the leaderboard.
+            </p>
+          ) : (
+            <ul className="mt-3 space-y-2">
+              {session.referrals!.map((r, i) => (
+                <li
+                  key={`${r.full_name}-${r.created_at || i}`}
+                  className="rounded-btn border border-theme bg-bg-high/50 px-3 py-2.5"
+                >
+                  <p className="font-medium text-ink">{r.full_name}</p>
+                  <p className="mt-0.5 text-xs text-ink-muted">
+                    {[r.department, r.level ? `Level ${r.level}` : null, r.niche]
+                      .filter(Boolean)
+                      .join(" · ")}
+                    {r.created_at
+                      ? ` · joined ${new Date(r.created_at).toLocaleDateString()}`
+                      : ""}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
         <div>
           <p className="label-caps">Your referral link</p>

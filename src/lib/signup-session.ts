@@ -1,5 +1,14 @@
 import { SIGNUP_SESSION_KEY } from "./constants";
 
+/** Someone who signed up with this user's referral code. */
+export type ReferralEntry = {
+  full_name: string;
+  department?: string;
+  level?: string;
+  niche?: string;
+  created_at?: string;
+};
+
 /** Lightweight client-side memory of a completed registration. */
 export type SignupSession = {
   ref_code: string;
@@ -14,6 +23,7 @@ export type SignupSession = {
   referred_by?: string | null;
   created_at?: string;
   referral_count?: number;
+  referrals?: ReferralEntry[];
   saved_at: string;
 };
 
@@ -45,6 +55,20 @@ export function readSignupSession(): SignupSession | null {
         typeof parsed.referral_count === "number"
           ? parsed.referral_count
           : undefined,
+      referrals: Array.isArray(parsed.referrals)
+        ? parsed.referrals
+            .filter(
+              (r): r is ReferralEntry =>
+                !!r && typeof r === "object" && typeof (r as ReferralEntry).full_name === "string"
+            )
+            .map((r) => ({
+              full_name: String(r.full_name),
+              department: r.department ? String(r.department) : undefined,
+              level: r.level ? String(r.level) : undefined,
+              niche: r.niche ? String(r.niche) : undefined,
+              created_at: r.created_at ? String(r.created_at) : undefined,
+            }))
+        : undefined,
       saved_at: parsed.saved_at
         ? String(parsed.saved_at)
         : new Date().toISOString(),

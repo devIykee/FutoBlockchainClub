@@ -91,10 +91,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { count } = await supabase
+    // People who used this user's referral code (no PII beyond what they shared at signup)
+    const { data: referredRows, error: refErr } = await supabase
       .from("signups")
-      .select("id", { count: "exact", head: true })
-      .eq("referred_by", row.ref_code);
+      .select("full_name, department, level, niche, created_at")
+      .eq("referred_by", row.ref_code)
+      .order("created_at", { ascending: false });
+
+    if (refErr) {
+      console.error("signup referrals:", refErr);
+    }
+
+    const referrals = (referredRows || []).map((r) => ({
+      full_name: r.full_name as string,
+      department: (r.department as string) || undefined,
+      level: (r.level as string) || undefined,
+      niche: (r.niche as string) || undefined,
+      created_at: (r.created_at as string) || undefined,
+    }));
 
     return NextResponse.json(
       {
@@ -110,7 +124,8 @@ export async function POST(req: NextRequest) {
           telegram_username: row.telegram_username,
           referred_by: row.referred_by,
           created_at: row.created_at,
-          referral_count: count ?? 0,
+          referral_count: referrals.length,
+          referrals,
         },
       },
       { headers: { "Cache-Control": "no-store" } }
