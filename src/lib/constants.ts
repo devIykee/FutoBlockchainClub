@@ -7,7 +7,7 @@ export const ADMIN_COOKIE_NAME = "fbc_admin_session";
 /** Persists signup social click + checkbox state across refresh */
 export const SOCIAL_VERIFY_STORAGE_KEY = "fbc_social_verify";
 
-/** Leaderboard poll interval — free-tier friendly. */
+/** Leaderboard poll interval - free-tier friendly. */
 export const LEADERBOARD_POLL_MS = 45_000;
 
 export const LEVELS = ["100", "200", "300", "400", "500", "Postgrad"] as const;
@@ -28,12 +28,12 @@ export type Level = (typeof LEVELS)[number];
 export type Niche = (typeof NICHES)[number];
 export type SkillLevel = (typeof SKILL_LEVELS)[number];
 
-/** Contest steps — sequential, icons not numbered decoration. */
+/** Contest steps - sequential, icons not numbered decoration. */
 export const HOW_IT_WORKS = [
   {
     id: "ledger",
     title: "Join Ledger TG",
-    body: "Join the Ledger Next community on Telegram — the first gate of the contest.",
+    body: "Join the Ledger Next community on Telegram - the first gate of the contest.",
     icon: "send" as const,
   },
   {
@@ -69,7 +69,7 @@ export const CLUB_HIGHLIGHTS = [
   },
   {
     title: "Community",
-    body: "A home for FUTO students exploring Web3 — from first-timers to advanced builders.",
+    body: "A home for FUTO students exploring Web3 - from first-timers to advanced builders.",
     icon: "users" as const,
   },
   {

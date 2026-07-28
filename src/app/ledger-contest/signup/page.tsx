@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SignupForm } from "@/components/SignupForm";
+import { SignUpClient } from "./SignUpClient";
 
 export const metadata: Metadata = {
   title: "Sign up · Ledger Contest",
@@ -7,8 +7,8 @@ export const metadata: Metadata = {
 
 export default function ContestSignupPage() {
   return (
-    <div className="bg-ambient px-page-x py-10 md:px-page-x-md md:py-14">
-      <SignupForm />
+    <div className="bg-ambient">
+      <SignUpClient />
     </div>
   );
 }

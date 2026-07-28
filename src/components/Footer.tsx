@@ -1,114 +1,111 @@
 import Link from "next/link";
+import { FBCLogo } from "./FBCLogo";
+import { X, MessageCircle, Mail } from "lucide-react";
 import { SOCIAL_LINKS } from "@/lib/socials";
-import { Logo } from "./Logo";
 
 export function Footer() {
-  const year = new Date().getFullYear();
+  const currentYear = new Date().getFullYear();
+
+  const footerLinks = {
+    explore: [
+      { label: "Home", href: "/" },
+      { label: "About", href: "/about" },
+      { label: "Team", href: "/team" },
+      { label: "Hall of Fame", href: "/hall-of-fame" },
+    ],
+    campaigns: [
+      { label: "Contest", href: "/ledger-contest" },
+      { label: "Leaderboard", href: "/ledger-contest/leaderboard" },
+      { label: "Sign Up", href: "/ledger-contest/signup" },
+    ],
+    connect: [
+      { label: "X (Twitter)", href: SOCIAL_LINKS.fbcX, icon: X },
+      { label: "Telegram", href: SOCIAL_LINKS.fbcTelegram, icon: MessageCircle },
+      { label: "Email", href: "mailto:fbc@futo.edu.ng", icon: Mail },
+      { label: "WhatsApp", href: SOCIAL_LINKS.fbcWhatsApp, icon: MessageCircle },
+    ],
+  };
 
   return (
-    <footer
-      className="mt-auto w-full border-t bg-bg-deep"
-      style={{ borderColor: "var(--border)" }}
-    >
-      <div className="mx-auto flex w-full max-w-container flex-col gap-10 page-pad py-12 md:flex-row md:items-start md:justify-between">
-        <div className="max-w-sm space-y-4">
-          <div>
-            <Logo size={36} />
+    <footer className="bg-gray-900 text-white pt-16 pb-8">
+      <div className="container">
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+          {/* Brand Section */}
+          <div className="lg:col-span-1">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <img src="/logo.svg" alt="FBC Logo" className="w-8 h-6" />
+              </div>
+              <span className="font-bold text-lg">FBC</span>
+            </div>
+            <p className="text-gray-400 text-sm">
+              Building the future of Web3 at FUTO
+            </p>
           </div>
-          <p className="text-base leading-relaxed text-ink">
-            FUTO Blockchain Club — building community, skills, and on-chain culture at the
-            Federal University of Technology, Owerri.
-          </p>
+
+          {/* Explore Links */}
+          <div>
+            <h3 className="font-semibold text-white mb-4">Explore</h3>
+            <ul className="space-y-2">
+              {footerLinks.explore.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href}>
+                    <span className="text-gray-400 hover:text-white text-sm transition-colors cursor-pointer">
+                      {link.label}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Campaigns Links */}
+          <div>
+            <h3 className="font-semibold text-white mb-4">Campaigns</h3>
+            <ul className="space-y-2">
+              {footerLinks.campaigns.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href}>
+                    <span className="text-gray-400 hover:text-white text-sm transition-colors cursor-pointer">
+                      {link.label}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Connect Links */}
+          <div>
+            <h3 className="font-semibold text-white mb-4">Connect</h3>
+            <ul className="space-y-2">
+              {footerLinks.connect.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <li key={link.href}>
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-400 hover:text-white text-sm transition-colors flex items-center gap-2"
+                    >
+                      <Icon className="w-4 h-4" />
+                      {link.label}
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 sm:gap-10">
-          <div>
-            <p className="label-caps mb-3">Explore</p>
-            <ul className="space-y-2.5 text-sm text-ink-muted">
-              <li>
-                <Link href="/" className="hover:text-ink transition-colors">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link href="/hall-of-fame" className="hover:text-ink transition-colors">
-                  Hall of Fame
-                </Link>
-              </li>
-              <li>
-                <Link href="/team" className="hover:text-ink transition-colors">
-                  Team
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <p className="label-caps mb-3">Campaigns</p>
-            <ul className="space-y-2.5 text-sm text-ink-muted">
-              <li>
-                <Link href="/ledger-contest" className="hover:text-ink transition-colors">
-                  Ledger Contest
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/ledger-contest/leaderboard"
-                  className="hover:text-ink transition-colors"
-                >
-                  Leaderboard
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/ledger-contest/signup"
-                  className="hover:text-ink transition-colors"
-                >
-                  Sign up
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <p className="label-caps mb-3">Socials</p>
-            <ul className="space-y-2.5 text-sm text-ink-muted">
-              <li>
-                <a
-                  href={SOCIAL_LINKS.fbcX}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-ink transition-colors"
-                >
-                  X / Twitter
-                </a>
-              </li>
-              <li>
-                <a
-                  href={SOCIAL_LINKS.fbcTelegram}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-ink transition-colors"
-                >
-                  Telegram
-                </a>
-              </li>
-              <li>
-                <a
-                  href={SOCIAL_LINKS.fbcWhatsApp}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-ink transition-colors"
-                >
-                  WhatsApp
-                </a>
-              </li>
-            </ul>
-          </div>
+        {/* Divider */}
+        <div className="border-t border-gray-800 pt-8">
+          <p className="text-gray-400 text-sm text-center">
+            © {currentYear} FUTO Blockchain Club. All rights reserved.
+          </p>
         </div>
-      </div>
-      <div className="border-t page-pad py-4" style={{ borderColor: "var(--border)" }}>
-        <p className="mx-auto max-w-container text-center text-xs text-ink-dim md:text-left">
-          © {year} FutoBlockchainClub. All rights reserved.
-        </p>
       </div>
     </footer>
   );

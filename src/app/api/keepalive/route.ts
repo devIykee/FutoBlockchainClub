@@ -3,7 +3,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/server";
 
 /**
  * Lightweight keep-alive for Supabase free-tier inactivity pause.
- * Hit every few days via GitHub Actions — only counts participants (no PII).
+ * Hit every few days via GitHub Actions - only counts participants (no PII).
  */
 export const dynamic = "force-dynamic";
 
