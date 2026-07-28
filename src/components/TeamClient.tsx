@@ -36,13 +36,14 @@ export function TeamClient() {
       <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {members.map((member) => (
           <article key={member.id} className="card-surface">
-            <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-white/5 text-sm font-bold text-ink ring-1 ring-white/10">
+            <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-bg-high text-sm font-bold text-ink ring-1 ring-theme">
               {member.photo ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={member.photo}
-                  alt=""
+                  alt={member.name}
                   className="h-full w-full object-cover"
+                  loading="lazy"
                 />
               ) : (
                 initials(member.name)
