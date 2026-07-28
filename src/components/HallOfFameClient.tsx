@@ -68,7 +68,7 @@ export function HallOfFameClient() {
       </div>
 
       {!loading && entries.length === 0 && (
-        <p className="mt-12 text-ink-muted">No entries yet — check back soon.</p>
+        <p className="mt-12 text-ink-muted">No entries yet - check back soon.</p>
       )}
     </div>
   );

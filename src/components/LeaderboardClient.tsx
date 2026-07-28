@@ -73,7 +73,7 @@ export function LeaderboardClient() {
             Referral rankings
           </h1>
           <p className="mt-3 text-base leading-relaxed text-ink">
-            Ranked by verified referrals. Names are anonymized — first name + last initial
+            Ranked by verified referrals. Names are anonymized - first name + last initial
             only. Top 5 are prize-eligible.
           </p>
         </div>
@@ -83,12 +83,12 @@ export function LeaderboardClient() {
       <div className="mb-10 grid grid-cols-2 gap-3 md:mb-12 md:grid-cols-4 md:gap-4">
         <Stat
           label="Participants"
-          value={stats?.total_participants ?? "—"}
+          value={stats?.total_participants ?? "-"}
           icon={<Users className="h-4 w-4" />}
         />
         <Stat
           label="Total referrals"
-          value={stats?.total_referrals ?? "—"}
+          value={stats?.total_referrals ?? "-"}
           icon={<Link2 className="h-4 w-4" />}
         />
         <Stat

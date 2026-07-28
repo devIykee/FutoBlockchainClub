@@ -1,4 +1,4 @@
-/** Public community links — overridable via env at build time. */
+/** Public community links - overridable via env at build time. */
 
 export const SOCIAL_LINKS = {
   ledgerTelegram:

@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Hanken_Grotesk, Inter } from "next/font/google";
+import { Hanken_Grotesk, Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { RefCapture } from "@/components/RefCapture";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeScript } from "@/components/theme-script";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const hanken = Hanken_Grotesk({
@@ -17,6 +18,18 @@ const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
   weight: ["400", "500", "600", "700"],
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+  weight: ["400", "500", "600", "700"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains-mono",
+  weight: ["400", "500", "600"],
 });
 
 export const viewport: Viewport = {
@@ -37,7 +50,7 @@ export const metadata: Metadata = {
     template: "%s · FutoBlockchainClub",
   },
   description:
-    "Official website of FutoBlockchainClub (FBC) — community, education, bounties, and on-chain builders at FUTO.",
+    "Official website of FutoBlockchainClub (FBC) - community, education, bounties, and on-chain builders at FUTO.",
   applicationName: "FutoBlockchainClub",
   manifest: "/site.webmanifest",
   icons: {
@@ -58,7 +71,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "FutoBlockchainClub",
     description:
-      "FUTO Blockchain Club — events, education, community, and campaigns.",
+      "FUTO Blockchain Club - events, education, community, and campaigns.",
     type: "website",
     siteName: "FutoBlockchainClub",
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "FutoBlockchainClub" }],
@@ -67,7 +80,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "FutoBlockchainClub",
     description:
-      "FUTO Blockchain Club — events, education, community, and campaigns.",
+      "FUTO Blockchain Club - events, education, community, and campaigns.",
     images: ["/og.png"],
   },
 };
@@ -83,13 +96,14 @@ export default function RootLayout({
         <ThemeScript />
       </head>
       <body
-        className={`${hanken.variable} ${inter.variable} flex min-h-screen flex-col bg-bg font-sans text-ink antialiased`}
+        className={`${hanken.variable} ${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} flex min-h-screen flex-col bg-background font-sans text-foreground antialiased`}
       >
         <ThemeProvider>
           <RefCapture />
           <Nav />
           <main className="flex-1">{children}</main>
           <Footer />
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
