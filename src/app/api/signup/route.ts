@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
 import { generateRefCode } from "@/lib/ref-code";
 import { LEVELS, NICHES, SKILL_LEVELS } from "@/lib/constants";
+import { normalizePhone } from "@/lib/phone";
+import { isValidHandle, normalizeHandle } from "@/lib/normalize-identity";
 
 type Body = {
   full_name?: string;
@@ -9,6 +11,7 @@ type Body = {
   level?: string;
   niche?: string;
   skill_level?: string;
+  phone?: string;
   x_handle?: string;
   telegram_username?: string;
   referred_by?: string | null;
@@ -17,11 +20,40 @@ type Body = {
   followed_x?: boolean;
 };
 
-function cleanHandle(v: string): string {
-  return v.trim().replace(/^@+/, "");
+/** Simple in-memory rate limit: max signups per IP per window (serverless-friendly soft guard). */
+const rateBucket = new Map<string, { count: number; reset: number }>();
+const RATE_LIMIT = 5;
+const RATE_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+function clientIp(req: NextRequest): string {
+  return (
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    "unknown"
+  );
+}
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateBucket.get(ip);
+  if (!entry || now > entry.reset) {
+    rateBucket.set(ip, { count: 1, reset: now + RATE_WINDOW_MS });
+    return true;
+  }
+  if (entry.count >= RATE_LIMIT) return false;
+  entry.count += 1;
+  return true;
 }
 
 export async function POST(req: NextRequest) {
+  const ip = clientIp(req);
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json(
+      { error: "Too many signup attempts from this network. Try again later." },
+      { status: 429 }
+    );
+  }
+
   let body: Body;
   try {
     body = await req.json();
@@ -34,8 +66,9 @@ export async function POST(req: NextRequest) {
   const level = String(body.level || "").trim();
   const niche = String(body.niche || "").trim();
   const skill_level = String(body.skill_level || "").trim();
-  const x_handle = cleanHandle(String(body.x_handle || ""));
-  const telegram_username = cleanHandle(String(body.telegram_username || ""));
+  const phone = normalizePhone(String(body.phone || ""));
+  const x_handle = normalizeHandle(String(body.x_handle || ""));
+  const telegram_username = normalizeHandle(String(body.telegram_username || ""));
   const referred_by_raw = body.referred_by
     ? String(body.referred_by).trim()
     : null;
@@ -49,10 +82,31 @@ export async function POST(req: NextRequest) {
     !level ||
     !niche ||
     !skill_level ||
+    !phone ||
     !x_handle ||
     !telegram_username
   ) {
-    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    return NextResponse.json(
+      {
+        error: !phone
+          ? "Enter a valid phone number (e.g. 0801 234 5678 or +234…)"
+          : "Missing required fields",
+      },
+      { status: 400 }
+    );
+  }
+
+  if (!isValidHandle(x_handle)) {
+    return NextResponse.json(
+      { error: "X handle looks invalid (use 3–32 letters, numbers, _ or .)" },
+      { status: 400 }
+    );
+  }
+  if (!isValidHandle(telegram_username)) {
+    return NextResponse.json(
+      { error: "Telegram username looks invalid" },
+      { status: 400 }
+    );
   }
 
   if (!(LEVELS as readonly string[]).includes(level)) {
@@ -71,21 +125,92 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Same person cannot use X handle as TG handle as a soft signal of bot spam
+  if (x_handle === telegram_username) {
+    return NextResponse.json(
+      { error: "X and Telegram usernames must be different accounts" },
+      { status: 400 }
+    );
+  }
+
   try {
     const supabase = getSupabaseAdmin();
 
-    // Validate referred_by exists; ignore if not
-    let referred_by: string | null = null;
-    if (referred_by_raw) {
-      const { data: referrer } = await supabase
-        .from("signups")
-        .select("ref_code")
-        .eq("ref_code", referred_by_raw)
-        .maybeSingle();
-      if (referrer) referred_by = referrer.ref_code;
+    // Pre-check duplicates with friendly messages (also enforced by unique indexes)
+    const { data: dupPhone } = await supabase
+      .from("signups")
+      .select("id")
+      .eq("phone", phone)
+      .maybeSingle();
+    if (dupPhone) {
+      return NextResponse.json(
+        {
+          error:
+            "This phone number is already registered. Each person may only sign up once.",
+        },
+        { status: 409 }
+      );
     }
 
-    // Generate unique ref_code with retries
+    const { data: dupX } = await supabase
+      .from("signups")
+      .select("id")
+      .ilike("x_handle", x_handle)
+      .maybeSingle();
+    if (dupX) {
+      return NextResponse.json(
+        { error: "This X handle is already registered." },
+        { status: 409 }
+      );
+    }
+
+    const { data: dupTg } = await supabase
+      .from("signups")
+      .select("id")
+      .ilike("telegram_username", telegram_username)
+      .maybeSingle();
+    if (dupTg) {
+      return NextResponse.json(
+        { error: "This Telegram username is already registered." },
+        { status: 409 }
+      );
+    }
+
+    // Validate referred_by exists; ignore invalid codes (don't invent free referrals)
+    let referred_by: string | null = null;
+    if (referred_by_raw) {
+      // Block obviously bogus short codes
+      if (referred_by_raw.length < 4 || referred_by_raw.length > 16) {
+        return NextResponse.json(
+          { error: "Invalid referral code" },
+          { status: 400 }
+        );
+      }
+      const { data: referrer } = await supabase
+        .from("signups")
+        .select("ref_code, phone, x_handle, telegram_username")
+        .eq("ref_code", referred_by_raw)
+        .maybeSingle();
+      if (referrer) {
+        // Same identity cannot "refer" themselves via a second account sharing phone/handle
+        // (already blocked by unique phone/handle; still clear if they match referrer)
+        if (
+          referrer.phone === phone ||
+          (referrer.x_handle &&
+            normalizeHandle(referrer.x_handle) === x_handle) ||
+          (referrer.telegram_username &&
+            normalizeHandle(referrer.telegram_username) === telegram_username)
+        ) {
+          return NextResponse.json(
+            { error: "Self-referral is not allowed." },
+            { status: 400 }
+          );
+        }
+        referred_by = referrer.ref_code;
+      }
+      // Invalid code → ignore (signup still allowed without credit)
+    }
+
     let ref_code = generateRefCode();
     let inserted = null as { ref_code: string } | null;
     let lastError: string | null = null;
@@ -99,6 +224,7 @@ export async function POST(req: NextRequest) {
           level,
           niche,
           skill_level,
+          phone,
           x_handle,
           telegram_username,
           ref_code,
@@ -115,24 +241,54 @@ export async function POST(req: NextRequest) {
         break;
       }
 
-      // Unique violation on ref_code → retry
-      if (error?.code === "23505" && error.message?.includes("ref_code")) {
-        ref_code = generateRefCode();
-        lastError = error.message;
-        continue;
+      if (error?.code === "23505") {
+        const msg = error.message || "";
+        if (msg.includes("ref_code")) {
+          ref_code = generateRefCode();
+          lastError = error.message;
+          continue;
+        }
+        if (msg.includes("phone")) {
+          return NextResponse.json(
+            {
+              error:
+                "This phone number is already registered. Each person may only sign up once.",
+            },
+            { status: 409 }
+          );
+        }
+        if (msg.includes("x_handle")) {
+          return NextResponse.json(
+            { error: "This X handle is already registered." },
+            { status: 409 }
+          );
+        }
+        if (msg.includes("telegram")) {
+          return NextResponse.json(
+            { error: "This Telegram username is already registered." },
+            { status: 409 }
+          );
+        }
       }
 
-      // Duplicate handle-ish not enforced; surface other errors
       lastError = error?.message || "Insert failed";
       break;
     }
 
     if (!inserted) {
       console.error("signup insert failed:", lastError);
-      return NextResponse.json(
-        { error: lastError || "Could not create signup" },
-        { status: 500 }
-      );
+      const msg = lastError || "Could not create signup";
+      // Surface clearer copy for constraint failures (migration vs app mismatch, etc.)
+      if (/null value in column "phone"/i.test(msg)) {
+        return NextResponse.json(
+          {
+            error:
+              "Phone number is required. Please enter a valid Nigerian phone number.",
+          },
+          { status: 400 }
+        );
+      }
+      return NextResponse.json({ error: msg }, { status: 500 });
     }
 
     return NextResponse.json({ ref_code: inserted.ref_code });

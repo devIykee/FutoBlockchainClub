@@ -4,6 +4,8 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ExternalLink, Lock, LockOpen, Send } from "lucide-react";
 import { LEVELS, NICHES, SKILL_LEVELS } from "@/lib/constants";
+import { isValidPhone, normalizePhone } from "@/lib/phone";
+import { isValidHandle, normalizeHandle } from "@/lib/normalize-identity";
 import { SOCIAL_LINKS } from "@/lib/socials";
 import {
   clearSocialVerify,
@@ -100,6 +102,7 @@ export function SignupForm() {
     level: string;
     niche: string;
     skill_level: string;
+    phone: string;
     x_handle: string;
     telegram_username: string;
   }): Record<string, string> {
@@ -111,11 +114,21 @@ export function SignupForm() {
     if (!payload.level) errs.level = "Select a level";
     if (!payload.niche) errs.niche = "Select a niche";
     if (!payload.skill_level) errs.skill_level = "Select a skill level";
-    if (!payload.x_handle || payload.x_handle.length < 1) {
-      errs.x_handle = "X handle is required";
+    if (!payload.phone || !isValidPhone(payload.phone)) {
+      errs.phone = "Enter a valid phone (e.g. 0801 234 5678)";
     }
-    if (!payload.telegram_username || payload.telegram_username.length < 1) {
-      errs.telegram_username = "Telegram username is required";
+    if (!payload.x_handle || !isValidHandle(payload.x_handle)) {
+      errs.x_handle = "Enter a valid X handle (no @ needed)";
+    }
+    if (!payload.telegram_username || !isValidHandle(payload.telegram_username)) {
+      errs.telegram_username = "Enter a valid Telegram username";
+    }
+    if (
+      payload.x_handle &&
+      payload.telegram_username &&
+      normalizeHandle(payload.x_handle) === normalizeHandle(payload.telegram_username)
+    ) {
+      errs.telegram_username = "Must be different from your X handle";
     }
     return errs;
   }
@@ -126,16 +139,16 @@ export function SignupForm() {
     setError(null);
 
     const fd = new FormData(e.currentTarget);
+    const phoneRaw = String(fd.get("phone") || "").trim();
     const payload = {
       full_name: String(fd.get("full_name") || "").trim(),
       department: String(fd.get("department") || "").trim(),
       level: String(fd.get("level") || "").trim(),
       niche: String(fd.get("niche") || "").trim(),
       skill_level: String(fd.get("skill_level") || "").trim(),
-      x_handle: String(fd.get("x_handle") || "").trim().replace(/^@/, ""),
-      telegram_username: String(fd.get("telegram_username") || "")
-        .trim()
-        .replace(/^@/, ""),
+      phone: normalizePhone(phoneRaw) || phoneRaw,
+      x_handle: normalizeHandle(String(fd.get("x_handle") || "")),
+      telegram_username: normalizeHandle(String(fd.get("telegram_username") || "")),
       referred_by: referredBy || null,
       joined_ledger: checked.ledger,
       joined_fbc: checked.fbc,
@@ -278,9 +291,22 @@ export function SignupForm() {
             error={fieldErrors.skill_level}
           />
           <Field
+            label="Phone number"
+            name="phone"
+            placeholder="0801 234 5678"
+            error={fieldErrors.phone}
+            inputMode="tel"
+            autoComplete="tel"
+            type="tel"
+          />
+          <p className="-mt-3 text-xs text-ink-dim">
+            Used once per person to prevent multi-account referral abuse. NG numbers
+            preferred (e.g. 080… or +234…).
+          </p>
+          <Field
             label="X (Twitter) handle"
             name="x_handle"
-            placeholder="@username"
+            placeholder="username"
             error={fieldErrors.x_handle}
             inputMode="text"
             autoCapitalize="none"
@@ -289,7 +315,7 @@ export function SignupForm() {
           <Field
             label="Telegram username"
             name="telegram_username"
-            placeholder="@username"
+            placeholder="username"
             error={fieldErrors.telegram_username}
             inputMode="text"
             autoCapitalize="none"
@@ -321,22 +347,24 @@ function Field({
   autoComplete,
   autoCapitalize,
   autoCorrect,
+  type = "text",
 }: {
   label: string;
   name: string;
   placeholder?: string;
   error?: string;
-  inputMode?: "text" | "email" | "tel" | "url";
+  inputMode?: "text" | "email" | "tel" | "url" | "numeric";
   autoComplete?: string;
   autoCapitalize?: string;
   autoCorrect?: string;
+  type?: "text" | "tel";
 }) {
   return (
     <label className="block space-y-1.5">
       <span className="label-caps">{label}</span>
       <input
         name={name}
-        type="text"
+        type={type}
         placeholder={placeholder}
         inputMode={inputMode}
         autoComplete={autoComplete}
