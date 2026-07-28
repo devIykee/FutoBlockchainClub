@@ -125,14 +125,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Same person cannot use X handle as TG handle as a soft signal of bot spam
-  if (x_handle === telegram_username) {
-    return NextResponse.json(
-      { error: "X and Telegram usernames must be different accounts" },
-      { status: 400 }
-    );
-  }
-
   try {
     const supabase = getSupabaseAdmin();
 

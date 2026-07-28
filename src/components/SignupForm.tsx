@@ -123,13 +123,6 @@ export function SignupForm() {
     if (!payload.telegram_username || !isValidHandle(payload.telegram_username)) {
       errs.telegram_username = "Enter a valid Telegram username";
     }
-    if (
-      payload.x_handle &&
-      payload.telegram_username &&
-      normalizeHandle(payload.x_handle) === normalizeHandle(payload.telegram_username)
-    ) {
-      errs.telegram_username = "Must be different from your X handle";
-    }
     return errs;
   }
 
