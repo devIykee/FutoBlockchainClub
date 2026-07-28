@@ -221,7 +221,14 @@ export function RegistrationPanel({
                   key={`${r.full_name}-${r.created_at || i}`}
                   className="rounded-btn border border-theme bg-bg-high/50 px-3 py-2.5"
                 >
-                  <p className="font-medium text-ink">{r.full_name}</p>
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="font-medium text-ink">{r.full_name}</p>
+                    {r.status && (
+                      <span className="shrink-0 text-[10px] font-medium uppercase tracking-wide text-ink-dim">
+                        {r.status}
+                      </span>
+                    )}
+                  </div>
                   <p className="mt-0.5 text-xs text-ink-muted">
                     {[r.department, r.level ? `Level ${r.level}` : null, r.niche]
                       .filter(Boolean)

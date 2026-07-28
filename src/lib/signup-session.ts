@@ -7,6 +7,7 @@ export type ReferralEntry = {
   level?: string;
   niche?: string;
   created_at?: string;
+  status?: string;
 };
 
 /** Lightweight client-side memory of a completed registration. */
@@ -67,6 +68,7 @@ export function readSignupSession(): SignupSession | null {
               level: r.level ? String(r.level) : undefined,
               niche: r.niche ? String(r.niche) : undefined,
               created_at: r.created_at ? String(r.created_at) : undefined,
+              status: r.status ? String(r.status) : undefined,
             }))
         : undefined,
       saved_at: parsed.saved_at

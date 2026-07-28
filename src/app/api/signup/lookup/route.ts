@@ -94,7 +94,9 @@ export async function POST(req: NextRequest) {
     // People who used this user's referral code (no PII beyond what they shared at signup)
     const { data: referredRows, error: refErr } = await supabase
       .from("signups")
-      .select("full_name, department, level, niche, created_at")
+      .select(
+        "full_name, department, level, niche, created_at, referral_status"
+      )
       .eq("referred_by", row.ref_code)
       .order("created_at", { ascending: false });
 
@@ -108,7 +110,10 @@ export async function POST(req: NextRequest) {
       level: (r.level as string) || undefined,
       niche: (r.niche as string) || undefined,
       created_at: (r.created_at as string) || undefined,
+      status: (r.referral_status as string) || "pending",
     }));
+
+    const verifiedCount = referrals.filter((r) => r.status === "verified").length;
 
     return NextResponse.json(
       {
@@ -124,7 +129,9 @@ export async function POST(req: NextRequest) {
           telegram_username: row.telegram_username,
           referred_by: row.referred_by,
           created_at: row.created_at,
-          referral_count: referrals.length,
+          /** Verified referrals only (leaderboard / rewards) */
+          referral_count: verifiedCount,
+          /** All active referrals with status for the portal */
           referrals,
         },
       },

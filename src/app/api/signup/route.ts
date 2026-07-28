@@ -208,25 +208,53 @@ export async function POST(req: NextRequest) {
     let lastError: string | null = null;
 
     for (let attempt = 0; attempt < 5; attempt++) {
-      const { data, error } = await supabase
-        .from("signups")
-        .insert({
-          full_name,
-          department,
-          level,
-          niche,
-          skill_level,
-          phone,
-          x_handle,
-          telegram_username,
-          ref_code,
-          referred_by,
-          joined_ledger,
-          joined_fbc,
-          followed_x,
-        })
-        .select("ref_code")
-        .single();
+      const baseRow = {
+        full_name,
+        department,
+        level,
+        niche,
+        skill_level,
+        phone,
+        x_handle,
+        telegram_username,
+        ref_code,
+        referred_by,
+        joined_ledger,
+        joined_fbc,
+        followed_x,
+      };
+      // Prefer moderation columns; fall back if migration not yet applied
+      let data: { ref_code: string } | null = null;
+      let error: { message?: string; code?: string } | null = null;
+
+      {
+        const res = await supabase
+          .from("signups")
+          .insert({
+            ...baseRow,
+            referral_status: referred_by ? "pending" : null,
+            referral_source: referred_by ? "referral_link" : null,
+          })
+          .select("ref_code")
+          .single();
+        data = res.data;
+        error = res.error;
+      }
+
+      if (
+        error &&
+        /referral_status|referral_source|schema cache|column/i.test(
+          error.message || ""
+        )
+      ) {
+        const res = await supabase
+          .from("signups")
+          .insert(baseRow)
+          .select("ref_code")
+          .single();
+        data = res.data;
+        error = res.error;
+      }
 
       if (!error && data) {
         inserted = data;
@@ -237,7 +265,7 @@ export async function POST(req: NextRequest) {
         const msg = error.message || "";
         if (msg.includes("ref_code")) {
           ref_code = generateRefCode();
-          lastError = error.message;
+          lastError = error.message || "ref_code conflict";
           continue;
         }
         if (msg.includes("phone")) {

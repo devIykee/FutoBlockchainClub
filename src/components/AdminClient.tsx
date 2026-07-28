@@ -5,8 +5,9 @@ import { Download, LogOut, Plus, RefreshCw, Trash2, Pencil } from "lucide-react"
 import type { HallOfFameRow, Signup, TeamMemberRow } from "@/lib/types";
 import { LEVELS, NICHES } from "@/lib/constants";
 import { ImageUploadField } from "@/components/ImageUploadField";
+import { AdminReferralsPanel } from "@/components/AdminReferralsPanel";
 
-type Tab = "signups" | "team" | "hof";
+type Tab = "signups" | "referrals" | "team" | "hof";
 
 export function AdminClient() {
   const [authed, setAuthed] = useState<boolean | null>(null);
@@ -186,6 +187,7 @@ export function AdminClient() {
 
   const tabs: { id: Tab; label: string }[] = [
     { id: "signups", label: `Signups (${signups.length})` },
+    { id: "referrals", label: "Referrals" },
     { id: "team", label: `Team (${team.length})` },
     { id: "hof", label: `Hall of Fame (${hof.length})` },
   ];
@@ -249,6 +251,9 @@ export function AdminClient() {
           sortKey={sortKey}
           setSortKey={setSortKey}
         />
+      )}
+      {tab === "referrals" && (
+        <AdminReferralsPanel setError={setLoadError} />
       )}
       {tab === "team" && (
         <TeamPanel members={team} onChange={loadAll} setError={setLoadError} />
