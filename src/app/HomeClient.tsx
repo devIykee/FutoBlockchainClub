@@ -6,7 +6,7 @@ import { CountUp } from '@/components/CountUp';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Code, Users, Trophy, BookOpen, Scale } from 'lucide-react';
+import { Code, Users, Trophy, BookOpen, Scale } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 const GalleryImage = ({ index }: { index: number }) => {
