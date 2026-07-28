@@ -105,7 +105,7 @@ export async function GET(
           verified,
           pending,
           rejected,
-          countable: verified,
+          countable: verified + pending,
           removed_history: (formerlyReferred || []).length,
         },
         audit: audit || [],

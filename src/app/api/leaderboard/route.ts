@@ -6,47 +6,22 @@ import type { LeaderboardEntry, LeaderboardStats } from "@/lib/types";
 export const dynamic = "force-dynamic";
 
 /**
- * Public leaderboard — only VERIFIED referrals count.
+ * Public leaderboard — active referrals count (pending + verified).
+ * Rejected / removed credits do not count (admin moderation).
  */
 export async function GET() {
   try {
     const supabase = getSupabaseAdmin();
 
-    // Prefer the secure view (migration counts verified only)
-    const { data: viewRows, error: viewError } = await supabase
-      .from("leaderboard")
-      .select("ref_code, full_name, referral_count")
-      .order("referral_count", { ascending: false });
-
     let entries: LeaderboardEntry[] = [];
     let total_participants = 0;
     let total_referrals = 0;
 
-    // Always compute from signups with verified filter as source of truth
-    // (view may lag if migration not applied; server aggregation is correct)
     const { data: all, error } = await supabase
       .from("signups")
       .select("ref_code, full_name, referred_by, referral_status");
 
     if (error) {
-      // Fallback to view-only if columns missing mid-migration
-      if (!viewError && viewRows) {
-        entries = viewRows.map((row, i) => ({
-          rank: i + 1,
-          display_name: anonymizeName(row.full_name as string),
-          referral_count: Number(row.referral_count) || 0,
-          ref_code: row.ref_code as string,
-        }));
-        total_referrals = entries.reduce((s, e) => s + e.referral_count, 0);
-        const { count } = await supabase
-          .from("signups")
-          .select("id", { count: "exact", head: true });
-        total_participants = count || 0;
-        return NextResponse.json(
-          { total_participants, total_referrals, entries } satisfies LeaderboardStats,
-          { headers: { "Cache-Control": "no-store" } }
-        );
-      }
       console.error(error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
@@ -56,10 +31,11 @@ export async function GET() {
     const counts = new Map<string, number>();
     for (const r of rows) {
       if (!r.referred_by) continue;
-      // Count verified only; if status column absent treat non-null referred_by as legacy pending (don't count)
-      if (r.referral_status === "verified") {
-        counts.set(r.referred_by, (counts.get(r.referred_by) || 0) + 1);
-      }
+      // Active credit: pending or verified. Rejected stays linked but does not score.
+      // removed has referred_by cleared so it never reaches here.
+      const status = r.referral_status || "pending";
+      if (status === "rejected" || status === "removed") continue;
+      counts.set(r.referred_by, (counts.get(r.referred_by) || 0) + 1);
     }
     const countPairs = Array.from(counts.entries());
     total_referrals = countPairs.reduce((s, [, n]) => s + n, 0);

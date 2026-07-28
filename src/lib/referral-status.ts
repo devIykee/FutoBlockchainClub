@@ -30,9 +30,10 @@ export function statusLabel(status: string | null | undefined): string {
   }
 }
 
-/** Credits that count toward leaderboard / rewards */
+/** Credits that count toward leaderboard / rewards (active until rejected/removed) */
 export function isCountableReferral(
   status: string | null | undefined
 ): boolean {
-  return status === "verified";
+  if (!status || status === "pending" || status === "verified") return true;
+  return false;
 }

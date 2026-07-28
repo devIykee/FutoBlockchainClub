@@ -113,7 +113,10 @@ export async function POST(req: NextRequest) {
       status: (r.referral_status as string) || "pending",
     }));
 
-    const verifiedCount = referrals.filter((r) => r.status === "verified").length;
+    // Leaderboard score: pending + verified (not rejected)
+    const countable = referrals.filter(
+      (r) => r.status !== "rejected" && r.status !== "removed"
+    ).length;
 
     return NextResponse.json(
       {
@@ -129,9 +132,9 @@ export async function POST(req: NextRequest) {
           telegram_username: row.telegram_username,
           referred_by: row.referred_by,
           created_at: row.created_at,
-          /** Verified referrals only (leaderboard / rewards) */
-          referral_count: verifiedCount,
-          /** All active referrals with status for the portal */
+          /** Active referrals that count on the leaderboard */
+          referral_count: countable,
+          /** All referrals with status for the portal */
           referrals,
         },
       },

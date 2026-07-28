@@ -258,8 +258,8 @@ export function AdminReferralsPanel({ setError }: Props) {
           </h2>
           <p className="mt-1 text-sm text-ink-muted">
             Review users, inspect referrer ↔ referred pairs, and verify / reject /
-            remove credits. Only <strong className="text-ink">verified</strong>{" "}
-            referrals count on the leaderboard.
+            remove credits. <strong className="text-ink">Pending + verified</strong>{" "}
+            count on the leaderboard; reject or remove drops the score.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -587,8 +587,7 @@ function ProfileView({
             <p className="label-caps">People they referred</p>
             <p className="mt-1 text-sm text-ink-muted">
               {totals.verified} verified · {totals.pending} pending ·{" "}
-              {totals.rejected} rejected · {totals.countable} countable for
-              rewards
+              {totals.rejected} rejected · {totals.countable} on leaderboard
             </p>
           </div>
         </div>
@@ -763,9 +762,9 @@ function ActionModal({
   };
   const hints = {
     verify:
-      "This signup will count toward the referrer’s leaderboard / rewards.",
+      "Marks this referral as checked OK. It already counts on the leaderboard while pending.",
     reject:
-      "Keeps the referrer link for inspection but does not count as a reward.",
+      "Keeps the link for inspection but REMOVES it from the leaderboard score.",
     remove:
       "Clears referred_by so the referrer loses this credit immediately. Requires a reason.",
   };

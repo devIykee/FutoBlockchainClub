@@ -135,8 +135,8 @@ export async function GET() {
           verified,
           pending,
           rejected,
-          /** Count used for rewards / leaderboard */
-          countable: verified,
+          /** Leaderboard score: pending + verified (not rejected) */
+          countable: verified + pending,
         },
         // Flags for suspicious-activity heuristics
         flags: {
