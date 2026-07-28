@@ -315,7 +315,7 @@ export function AdminReferralsPanel({ setError }: Props) {
           className="field-input w-auto min-w-[140px]"
         >
           <option value="created_at">Sort: newest</option>
-          <option value="referrals">Sort: verified refs</option>
+          <option value="referrals">Sort: leaderboard refs</option>
           <option value="name">Sort: name</option>
         </select>
       </div>
@@ -376,9 +376,10 @@ export function AdminReferralsPanel({ setError }: Props) {
                   <span className="text-cyan font-semibold">
                     {u.referral_totals?.countable ?? 0}
                   </span>
-                  {" verified · "}
+                  {" on board · "}
                   {u.referral_totals?.pending ?? 0} pend ·{" "}
-                  {u.referral_totals?.rejected ?? 0} rej
+                  {u.referral_totals?.verified ?? 0} ok ·{" "}
+                  {u.referral_totals?.rejected ?? 0} off
                 </td>
                 <td className="px-3 py-3">
                   <Flags flags={u.flags} />
@@ -425,7 +426,7 @@ export function AdminReferralsPanel({ setError }: Props) {
             </div>
             <p className="text-xs text-ink-muted">
               Joined {new Date(u.created_at).toLocaleDateString()} ·{" "}
-              {u.referral_totals?.countable ?? 0} verified refs
+              {u.referral_totals?.countable ?? 0} on leaderboard
             </p>
             <Flags flags={u.flags} />
           </button>
@@ -525,7 +526,7 @@ function ProfileView({
               onClick={() => onAction(user, "verify")}
             >
               <CheckCircle2 className="h-4 w-4" />
-              Verify referral
+              Mark verified
             </button>
             <button
               type="button"
@@ -533,7 +534,7 @@ function ProfileView({
               onClick={() => onAction(user, "reject")}
             >
               <XCircle className="h-4 w-4" />
-              Reject referral
+              Unverify / disqualify
             </button>
             <button
               type="button"
@@ -541,7 +542,7 @@ function ProfileView({
               onClick={() => onAction(user, "remove")}
             >
               <UserX className="h-4 w-4" />
-              Remove referral
+              Remove credit
             </button>
           </div>
         )}
@@ -624,14 +625,14 @@ function ProfileView({
                       className="btn-secondary !px-2 !py-1 text-xs"
                       onClick={() => onAction(r, "verify")}
                     >
-                      Verify
+                      Mark verified
                     </button>
                     <button
                       type="button"
                       className="btn-secondary !px-2 !py-1 text-xs"
                       onClick={() => onAction(r, "reject")}
                     >
-                      Reject
+                      Unverify
                     </button>
                     <button
                       type="button"
@@ -756,17 +757,17 @@ function ActionModal({
   onSubmit: (e: FormEvent) => void;
 }) {
   const titles = {
-    verify: "Verify referral",
-    reject: "Reject referral",
+    verify: "Mark referral verified",
+    reject: "Unverify / disqualify referral",
     remove: "Remove referral credit",
   };
   const hints = {
     verify:
-      "Marks this referral as checked OK. It already counts on the leaderboard while pending.",
+      "Optional check-mark. The referral already counts on the leaderboard from the moment of signup.",
     reject:
-      "Keeps the link for inspection but REMOVES it from the leaderboard score.",
+      "UNVERIFIES this referral — it stops counting on the leaderboard (link kept for inspection).",
     remove:
-      "Clears referred_by so the referrer loses this credit immediately. Requires a reason.",
+      "Fully clears the referral credit from the referrer. Leaderboard score drops immediately.",
   };
 
   return (

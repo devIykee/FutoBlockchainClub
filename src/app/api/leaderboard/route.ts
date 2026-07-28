@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
 import { anonymizeName } from "@/lib/anonymize";
+import { isCountableReferral } from "@/lib/referral-status";
 import type { LeaderboardEntry, LeaderboardStats } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
 /**
- * Public leaderboard — active referrals count (pending + verified).
- * Rejected / removed credits do not count (admin moderation).
+ * Public leaderboard — every successful signup via a ref link counts immediately.
+ * Score only drops when an admin rejects or removes the referral.
  */
 export async function GET() {
   try {
@@ -31,10 +32,8 @@ export async function GET() {
     const counts = new Map<string, number>();
     for (const r of rows) {
       if (!r.referred_by) continue;
-      // Active credit: pending or verified. Rejected stays linked but does not score.
-      // removed has referred_by cleared so it never reaches here.
-      const status = r.referral_status || "pending";
-      if (status === "rejected" || status === "removed") continue;
+      // Counts on create (pending/verified). Admin reject/remove stops counting.
+      if (!isCountableReferral(r.referral_status)) continue;
       counts.set(r.referred_by, (counts.get(r.referred_by) || 0) + 1);
     }
     const countPairs = Array.from(counts.entries());

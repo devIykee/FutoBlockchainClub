@@ -170,13 +170,12 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // countable rewards for referrer drop automatically (verified-only count)
     return NextResponse.json(
       {
         ok: true,
         signup: updated,
         message:
-          "Referral credit removed. Referrer’s verified count no longer includes this signup.",
+          "Referral credit removed. Referrer’s leaderboard count no longer includes this signup.",
       },
       { headers: { "Cache-Control": "no-store" } }
     );

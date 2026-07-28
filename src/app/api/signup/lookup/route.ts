@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
 import { normalizePhone } from "@/lib/phone";
+import { isCountableReferral } from "@/lib/referral-status";
 
 export const dynamic = "force-dynamic";
 
@@ -113,9 +114,9 @@ export async function POST(req: NextRequest) {
       status: (r.referral_status as string) || "pending",
     }));
 
-    // Leaderboard score: pending + verified (not rejected)
-    const countable = referrals.filter(
-      (r) => r.status !== "rejected" && r.status !== "removed"
+    // Same rule as public leaderboard: counts unless admin rejected/removed
+    const countable = referrals.filter((r) =>
+      isCountableReferral(r.status)
     ).length;
 
     return NextResponse.json(

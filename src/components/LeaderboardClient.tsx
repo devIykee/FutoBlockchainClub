@@ -73,7 +73,8 @@ export function LeaderboardClient() {
             Referral rankings
           </h1>
           <p className="mt-3 text-base leading-relaxed text-ink">
-            Ranked by verified referrals. Names are anonymized — first name + last initial
+            Ranked by referrals (updates as soon as someone signs up with your link).
+            Names are anonymized — first name + last initial
             only. Top 5 are prize-eligible.
           </p>
         </div>

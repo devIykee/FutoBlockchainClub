@@ -19,6 +19,7 @@ import {
   writeSignupSession,
 } from "@/lib/signup-session";
 import { formatPhoneDisplay, isValidPhone, normalizePhone } from "@/lib/phone";
+import { isCountableReferral } from "@/lib/referral-status";
 
 type Props = {
   /** Known session from this device */
@@ -182,9 +183,13 @@ export function RegistrationPanel({
           )}
           <Fact label="Referral code" value={session.ref_code} />
           <Fact
-            label="Successful referrals"
+            label="Leaderboard referrals"
             value={String(
-              session.referrals?.length ?? session.referral_count ?? 0
+              session.referrals
+                ? session.referrals.filter((r) =>
+                    isCountableReferral(r.status)
+                  ).length
+                : (session.referral_count ?? 0)
             )}
           />
         </dl>
