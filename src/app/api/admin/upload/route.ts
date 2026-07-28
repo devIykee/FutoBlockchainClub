@@ -8,12 +8,19 @@ export const runtime = "nodejs";
 
 const BUCKET = "media";
 const MAX_BYTES = 2 * 1024 * 1024; // 2 MiB
-const ALLOWED: Record<string, string> = {
+/** mime → file extension (plain object; avoid MapIterator for TS target) */
+const ALLOWED_MIME: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/png": "png",
   "image/webp": "webp",
   "image/gif": "gif",
 };
+const ALLOWED_MIME_LIST = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+] as const;
 
 function unauthorized() {
   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -29,7 +36,7 @@ async function ensureBucket() {
   const { error } = await supabase.storage.createBucket(BUCKET, {
     public: true,
     fileSizeLimit: MAX_BYTES,
-    allowedMimeTypes: Object.keys(ALLOWED),
+    allowedMimeTypes: [...ALLOWED_MIME_LIST],
   });
   // 409 / already exists is fine in races
   if (error && !/already exists|duplicate/i.test(error.message)) {
@@ -63,7 +70,7 @@ export async function POST(req: NextRequest) {
   }
 
   const mime = (file.type || "").toLowerCase();
-  const ext = ALLOWED[mime];
+  const ext = ALLOWED_MIME[mime];
   if (!ext) {
     return NextResponse.json(
       { error: "Only JPEG, PNG, WebP, or GIF images are allowed" },
