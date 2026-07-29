@@ -15,8 +15,8 @@ export const SOCIAL_VERIFY_STORAGE_KEY = "fbc_social_verify";
 /** Remembers this device's contest registration (ref + profile snapshot) */
 export const SIGNUP_SESSION_KEY = "fbc_signup_session";
 
-/** Leaderboard poll interval — free-tier friendly. */
-export const LEADERBOARD_POLL_MS = 45_000;
+/** Leaderboard poll interval — live re-rank as referrals come in. */
+export const LEADERBOARD_POLL_MS = 12_000;
 
 export const LEVELS = ["100", "200", "300", "400", "500", "Postgrad"] as const;
 

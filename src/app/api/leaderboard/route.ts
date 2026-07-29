@@ -5,50 +5,63 @@ import { isCountableReferral } from "@/lib/referral-status";
 import type { LeaderboardEntry, LeaderboardStats } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 /**
- * Public leaderboard — every successful signup via a ref link counts immediately.
- * Score only drops when an admin rejects or removes the referral.
+ * Live leaderboard: every referral counts on signup (pending/verified).
+ * Rejected/removed do not count. Ranked by count desc.
  */
 export async function GET() {
   try {
     const supabase = getSupabaseAdmin();
 
-    let entries: LeaderboardEntry[] = [];
-    let total_participants = 0;
-    let total_referrals = 0;
-
-    const { data: all, error } = await supabase
+    const { data: rows, error } = await supabase
       .from("signups")
-      .select("ref_code, full_name, referred_by, referral_status");
+      .select("ref_code, full_name, referred_by, referral_status, created_at");
 
     if (error) {
       console.error(error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    const rows = all || [];
-    total_participants = rows.length;
-    const counts = new Map<string, number>();
-    for (const r of rows) {
-      if (!r.referred_by) continue;
-      // Counts on create (pending/verified). Admin reject/remove stops counting.
-      if (!isCountableReferral(r.referral_status)) continue;
-      counts.set(r.referred_by, (counts.get(r.referred_by) || 0) + 1);
-    }
-    const countPairs = Array.from(counts.entries());
-    total_referrals = countPairs.reduce((s, [, n]) => s + n, 0);
+    const all = rows || [];
+    const total_participants = all.length;
 
-    const byCode = new Map(rows.map((r) => [r.ref_code, r.full_name]));
-    entries = countPairs
-      .map(([ref_code, referral_count]) => ({
-        ref_code,
-        referral_count,
-        display_name: anonymizeName(byCode.get(ref_code) || "Unknown"),
-        rank: 0,
-      }))
-      .sort((a, b) => b.referral_count - a.referral_count)
-      .map((e, i) => ({ ...e, rank: i + 1 }));
+    // ref_code → count of people who used that code
+    const counts = new Map<string, number>();
+    for (const r of all) {
+      if (!r.referred_by) continue;
+      if (!isCountableReferral(r.referral_status)) continue;
+      const code = String(r.referred_by);
+      counts.set(code, (counts.get(code) || 0) + 1);
+    }
+
+    const byCode = new Map(
+      all.map((r) => [String(r.ref_code), r] as const)
+    );
+
+    const entries: LeaderboardEntry[] = Array.from(counts.entries())
+      .map(([ref_code, referral_count]) => {
+        const owner = byCode.get(ref_code);
+        return {
+          ref_code,
+          referral_count,
+          display_name: anonymizeName(owner?.full_name || "Unknown"),
+          rank: 0,
+          // for stable sort when counts tie
+          _created: owner?.created_at || "",
+        };
+      })
+      .sort((a, b) => {
+        if (b.referral_count !== a.referral_count) {
+          return b.referral_count - a.referral_count;
+        }
+        // earlier signup ranks higher on tie
+        return String(a._created).localeCompare(String(b._created));
+      })
+      .map(({ _created, ...e }, i) => ({ ...e, rank: i + 1 }));
+
+    const total_referrals = entries.reduce((s, e) => s + e.referral_count, 0);
 
     const payload: LeaderboardStats = {
       total_participants,
@@ -57,7 +70,10 @@ export async function GET() {
     };
 
     return NextResponse.json(payload, {
-      headers: { "Cache-Control": "no-store" },
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate",
+        Pragma: "no-cache",
+      },
     });
   } catch (e) {
     console.error(e);

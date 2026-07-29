@@ -17,19 +17,30 @@ export function LeaderboardClient() {
 
   const load = useCallback(async () => {
     try {
-      const res = await fetch("/api/leaderboard", { cache: "no-store" });
+      const res = await fetch(`/api/leaderboard?t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { Pragma: "no-cache" },
+      });
       const data: LeaderboardStats = await res.json();
       if (!res.ok) throw new Error((data as { error?: string }).error || "Failed to load");
 
+      // Always re-sort client-side so ranks follow live counts
+      const sorted = [...(data.entries || [])].sort((a, b) => {
+        if (b.referral_count !== a.referral_count) {
+          return b.referral_count - a.referral_count;
+        }
+        return a.rank - b.rank;
+      }).map((e, i) => ({ ...e, rank: i + 1 }));
+
       const nextClimbed = new Set<string>();
-      for (const e of data.entries || []) {
+      for (const e of sorted) {
         const prev = prevRanks.current.get(e.ref_code);
         if (prev !== undefined && e.rank < prev) {
           nextClimbed.add(e.ref_code);
         }
       }
       const nextMap = new Map<string, number>();
-      for (const e of data.entries || []) {
+      for (const e of sorted) {
         nextMap.set(e.ref_code, e.rank);
       }
       prevRanks.current = nextMap;
@@ -39,7 +50,7 @@ export function LeaderboardClient() {
         window.setTimeout(() => setClimbed(new Set()), 1400);
       }
 
-      setStats(data);
+      setStats({ ...data, entries: sorted });
       setError(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load");
