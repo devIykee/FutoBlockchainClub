@@ -27,7 +27,6 @@ export async function GET() {
     const all = rows || [];
     const total_participants = all.length;
 
-    // ref_code → count of people who used that code
     const counts = new Map<string, number>();
     for (const r of all) {
       if (!r.referred_by) continue;
@@ -36,30 +35,38 @@ export async function GET() {
       counts.set(code, (counts.get(code) || 0) + 1);
     }
 
-    const byCode = new Map(
-      all.map((r) => [String(r.ref_code), r] as const)
-    );
+    const byCode = new Map(all.map((r) => [String(r.ref_code), r] as const));
 
-    const entries: LeaderboardEntry[] = Array.from(counts.entries())
+    type Row = {
+      ref_code: string;
+      referral_count: number;
+      display_name: string;
+      created: string;
+    };
+
+    const ranked: Row[] = Array.from(counts.entries())
       .map(([ref_code, referral_count]) => {
         const owner = byCode.get(ref_code);
         return {
           ref_code,
           referral_count,
           display_name: anonymizeName(owner?.full_name || "Unknown"),
-          rank: 0,
-          // for stable sort when counts tie
-          _created: owner?.created_at || "",
+          created: owner?.created_at ? String(owner.created_at) : "",
         };
       })
       .sort((a, b) => {
         if (b.referral_count !== a.referral_count) {
           return b.referral_count - a.referral_count;
         }
-        // earlier signup ranks higher on tie
-        return String(a._created).localeCompare(String(b._created));
-      })
-      .map(({ _created, ...e }, i) => ({ ...e, rank: i + 1 }));
+        return a.created.localeCompare(b.created);
+      });
+
+    const entries: LeaderboardEntry[] = ranked.map((e, i) => ({
+      ref_code: e.ref_code,
+      referral_count: e.referral_count,
+      display_name: e.display_name,
+      rank: i + 1,
+    }));
 
     const total_referrals = entries.reduce((s, e) => s + e.referral_count, 0);
 
